@@ -38,13 +38,22 @@ if (!function_exists('swac_get_delivery_cutoff_message')) {
 
         // 1. Weekend Window: Saturday 12:00 PM (noon) through Sunday 11:59:59 PM (midnight)
         if ($day === 7 || ($day === 6 && $hour >= 12)) {
-            $default_message = __('Order now to receive it by Monday', 'stateless-wa-commerce');
+            $days_to_monday = ($day === 7) ? 1 : 2;
+            $target_ts = $timestamp + ($days_to_monday * 86400);
+            $monday_date = function_exists('wp_date')
+                ? wp_date('j M', $target_ts, $tz)
+                : (new DateTimeImmutable('@' . $target_ts))->setTimezone($tz)->format('j M');
+            $default_message = sprintf(__('Order now to get it by Monday (%s)', 'stateless-wa-commerce'), $monday_date);
         } // 2. Morning Cutoff Window: Monday through Saturday, between 12:00 AM and 11:59:59 AM (noon)
         elseif ($hour < 12) {
             $default_message = __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce');
         } // 3. Weekday Afternoon/Evening Window: Monday through Friday, between 12:00 PM and 11:59:59 PM
         else {
-            $default_message = __('Order now to receive it by tomorrow', 'stateless-wa-commerce');
+            $target_ts = $timestamp + 86400;
+            $tomorrow_date = function_exists('wp_date')
+                ? wp_date('j M', $target_ts, $tz)
+                : (new DateTimeImmutable('@' . $target_ts))->setTimezone($tz)->format('j M');
+            $default_message = sprintf(__('Order now to receive it by tomorrow (%s)', 'stateless-wa-commerce'), $tomorrow_date);
         }
 
         /**
@@ -56,5 +65,18 @@ if (!function_exists('swac_get_delivery_cutoff_message')) {
          * @param int    $timestamp Current timestamp.
          */
         return (string)apply_filters('swac_delivery_cutoff_message', $default_message, $day, $hour, $timestamp);
+    }
+}
+
+if (!function_exists('g1_get_delivery_cutoff_message')) {
+    /**
+     * Backward-compatibility alias for legacy delivery cutoff function.
+     *
+     * @param int|null $timestamp
+     * @return string
+     */
+    function g1_get_delivery_cutoff_message(?int $timestamp = null): string
+    {
+        return swac_get_delivery_cutoff_message($timestamp);
     }
 }

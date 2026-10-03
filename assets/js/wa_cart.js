@@ -893,7 +893,7 @@
                 card.innerHTML = `
                     <div class="swac-loyalty-heading">🔒 Admin Notice</div>
                     <div class="swac-loyalty-body">
-                        Loyalty offer is currently <strong>turned off</strong> via <code>${disabledReason}</code> in <code>core/constants.php</code>. Visitors see nothing.
+                        Loyalty offer is currently <strong>turned off</strong> via <code>${disabledReason}</code> in <code>core/config.php</code>. Visitors see nothing.
                     </div>
                 `;
                 container.appendChild(card);
@@ -974,7 +974,7 @@
             <div class="swac-totals-row swac-totals-save"><span>Discount</span><span>${fmtInr(youSave)} (${savePct}% off)</span></div>
             <div class="swac-totals-row"><span>Shipping</span><span>${shipLabel}</span></div>
             ${loyaltyChoice === 'yes' && loyaltyActive
-                ? `<div class="swac-totals-row swac-totals-loyalty"><span>&#127873; ${escHtml(loy.itemLabel)} (worth ${fmtInr(loy.itemWorth)})</span><span>+${fmtInr(loy.itemPrice)}</span></div>`
+                ? `<div class="swac-totals-row swac-totals-loyalty cdr-totals-loyalty"><span><span class="cdr-loyalty-gift-icon" aria-hidden="true">&#127873;</span>${escHtml(loy.itemLabel)} (worth ${fmtInr(loy.itemWorth)})</span><span>+${fmtInr(loy.itemPrice)}</span></div>`
                 : ''}
             <div class="swac-totals-row swac-totals-payable"><span>To Pay</span><span>${fmtInr(amountPayable)}</span></div>
             <div class="swac-drawer-delivery-info">
@@ -1257,7 +1257,7 @@
             + `\n${sep}`;
 
         if (loyaltyChoice === 'yes' && loyaltyActive) {
-            msg += `\n\n\uD83C\uDF81 ${loy.itemLabel} (worth ${fmtInr(loy.itemWorth)}) \u2192 ${fmtInr(loy.itemPrice)} added to order`
+            msg += `\n\n\uD83C\uDF81  ${loy.itemLabel} (worth ${fmtInr(loy.itemWorth)}) \u2192 ${fmtInr(loy.itemPrice)} added to order`
                 + `\n${loy.flag}`
                 + `\n${sep}`;
         }
@@ -1572,43 +1572,56 @@
     // ── Delivery Cutoff Notice: Client-Side Hydration (Cache-Busting) ─────────
     // Reconciles static HTML with active store timezone to prevent stale notices
     // when pages are served from static full-page cache across cutoff boundaries.
-    function getDeliveryCutoffMessage() {
+    function getKolkataFormattedDate(baseIstDate, daysAhead) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const target = new Date(baseIstDate.getTime() + (daysAhead * 24 * 60 * 60 * 1000));
+        return `${target.getUTCDate()} ${months[target.getUTCMonth()]}`;
+    }
+
+    function getKolkataDeliveryCutoffMessage() {
         const now = new Date();
         const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
-        const localDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
-        const day = localDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-        const hour = localDate.getUTCHours(); // 0 to 23
+        const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
+        const day = istDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+        const hour = istDate.getUTCHours(); // 0 to 23
 
         const msgs = CONFIG.cutoffMessages || {};
-        const msgWeekend = msgs.weekend || 'Order now to receive it by Monday';
         const msgMorning = msgs.morning || 'Order before 12 noon for same-day delivery';
-        const msgAfternoon = msgs.afternoon || 'Order now to receive it by tomorrow';
 
         // 1. Weekend Window: Saturday 12:00 PM to Sunday 11:59:59 PM
         if (day === 0 || (day === 6 && hour >= 12)) {
-            return msgWeekend;
+            return `Order now to get it by Monday (${getKolkataFormattedDate(istDate, day === 0 ? 1 : 2)})`;
         }
         // 2. Morning Cutoff Window: Monday through Saturday, 12:00 AM to 11:59:59 AM
         if (hour < 12) {
             return msgMorning;
         }
         // 3. Weekday Afternoon/Evening: Monday through Friday, 12:00 PM to 11:59:59 PM
-        return msgAfternoon;
+        return `Order now to receive it by tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
     }
 
-    function getDeliveryEstimate() {
+    function getDeliveryCutoffMessage() {
+        return getKolkataDeliveryCutoffMessage();
+    }
+
+    function getKolkataDeliveryEstimate() {
         const now = new Date();
-        const localDate = new Date(now.getTime() + (CONFIG.timezoneOffset * 1000));
-        const day = localDate.getUTCDay();
-        const hour = localDate.getUTCHours();
+        const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
+        const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
+        const day = istDate.getUTCDay();
+        const hour = istDate.getUTCHours();
 
         if (day === 0 || (day === 6 && hour >= 12)) {
-            return 'Monday';
+            return `Monday (${getKolkataFormattedDate(istDate, day === 0 ? 1 : 2)})`;
         }
         if (hour < 12) {
             return 'Today (Same-day)';
         }
-        return 'Tomorrow';
+        return `Tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
+    }
+
+    function getDeliveryEstimate() {
+        return getKolkataDeliveryEstimate();
     }
 
     function hydrateDeliveryNotice() {

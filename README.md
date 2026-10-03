@@ -93,7 +93,7 @@ Customer cart items, address details, and delivery zone serviceability run in th
 - **Filterable Zone Registry**:
   Supports open checkout or gated delivery zones via `apply_filters('swac_delivery_zones', ...)`.
 - **Timezone-Aware Delivery Cutoffs**:
-  Calculates local order cutoffs using WordPress core `wp_timezone()`.
+  Calculates local order cutoffs using WordPress core `wp_timezone()`, complete with dynamic calendar date stamping `(j M)` for weekend and weekday afternoon windows.
 - **High-Performance Submodules**:
   - `modules/pharmacy/`: Chemical compositions (`composition`), pack sizes (`pack_size`), and generic alternate price comparisons.
   - `modules/explore/`: High-speed directory exploration for brands and categories with instant live client search.
@@ -178,12 +178,12 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 
 | Shortcode | Purpose | Example |
 | :--- | :--- | :--- |
-| `[swac_button]` | Standalone WhatsApp order/contact button | `[swac_button text="Order Now" message="Hi!"]` |
+| `[swac_button]` | Standalone WhatsApp order/contact button (supports `icon="yes\|no"`) | `[swac_button text="Order Now" icon="yes"]` |
 | `[swac_price_block]` | Hero price block with regular price & discount % | `[swac_price_block context="single"]` |
 | `[swac_pack_size]` | Product pack size badge | `[swac_pack_size]` |
 | `[swac_price_pack_hierarchy]` | Unified price and pack size container | `[swac_price_pack_hierarchy context="single"]` |
 | `[swac_action_row]` | Add to Order button with quantity controls | `[swac_action_row]` |
-| `[swac_delivery_notice]` | Dynamic dispatch cutoff notice | `[swac_delivery_notice]` |
+| `[swac_delivery_notice]` | Dynamic dispatch cutoff notice with date stamping | `[swac_delivery_notice]` |
 | `[swac_stock_status]` | Single product out-of-stock safety net badge | `[swac_stock_status]` |
 | `[swac_explore_brands]` | A-Z brand directory with live search | `[swac_explore_brands hide_empty="true"]` |
 | `[swac_categories_grid]`| Grid of child categories under a parent slug | `[swac_categories_grid parent_slug="electronics"]`|

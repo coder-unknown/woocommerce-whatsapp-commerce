@@ -9,7 +9,7 @@ It serves as the definitive reference for page builders, theme templates, and de
 
 | Primary Shortcode | Purpose | Key Attributes |
 | :--- | :--- | :--- |
-| `[swac_button]` | Customizable WhatsApp order/contact button | `text`, `message`, `fullwidth` |
+| `[swac_button]` | Customizable WhatsApp order/contact button | `text`, `message`, `fullwidth`, `icon` |
 | `[swac_price_block]` | Hero price display (Current price, MRP strike, discount %) | `context` (`single` \| `card`) |
 | `[swac_pack_size]` | Packaging unit badge (e.g. "10 Tablets", "500 ml"). | None |
 | `[swac_price_pack_hierarchy]` | Unified price and pack size container | `context` (`single` \| `card`) |
@@ -36,9 +36,14 @@ It serves as the definitive reference for page builders, theme templates, and de
   - `text` (string): Button label. Default: `'Order on WhatsApp'`.
   - `message` (string): Pre-filled text passed to WhatsApp. Default: `'Hello ' . get_bloginfo('name') . '.'`.
   - `fullwidth` (`'yes'` | `'no'`): Toggles 100% full-width block expansion. Default: `'no'`.
-- **Example**:
+  - `icon` (`'yes'` | `'no'`): Toggles rendering of the WhatsApp SVG icon. Set to `'no'` when providing custom emoji or icon prefixes in `text`. Default: `'yes'`.
+- **Aliases**: `[cdr_whatsapp_button]`
+- **Examples**:
   ```text
   [swac_button text="Chat with Us" message="I have a question about my order." fullwidth="yes"]
+  ```
+  ```text
+  [swac_button icon="no" text="📸 Send Prescription Photo" message="Hi, I am attaching my prescription."]
   ```
 
 ---
@@ -79,7 +84,11 @@ It serves as the definitive reference for page builders, theme templates, and de
   ```
 
 ### `[swac_delivery_notice]`
-- **Purpose**: Displays a live, timezone-aware delivery cutoff notice based on the configured delivery schedule.
+- **Purpose**: Displays a live, timezone-aware delivery cutoff notice based on the configured delivery schedule, complete with dynamic calendar date stamping `(j M)`.
+  - **Morning Window** (Mon–Sat < 12:00 PM): `"Order before 12 noon for same-day delivery"`
+  - **Weekday Afternoon Window** (Mon–Fri ≥ 12:00 PM): `"Order now to receive it by tomorrow (6 Oct)"`
+  - **Weekend Window** (Sat ≥ 12:00 PM or Sun): `"Order now to get it by Monday (5 Oct)"`
+- **Aliases**: `[g1_delivery_notice]`
 - **Example**:
   ```text
   [swac_delivery_notice]
@@ -144,8 +153,8 @@ It serves as the definitive reference for page builders, theme templates, and de
   ```
 
 ### `[swac_composition_tag]`
-- **Purpose**: Clickable active pharmaceutical salt composition tag linking to its salt archive.
-- **Attributes**: None.
+- **Purpose**: Clickable active pharmaceutical salt composition tag linking to its salt archive. Renders clean semantic markup without emoji prefixes (`<a href="..." class="pd-salt-tag">Paracetamol 500mg</a>`).
+- **Aliases**: `[g1_composition_tag]`
 - **Example**:
   ```text
   [swac_composition_tag]

@@ -45,7 +45,7 @@ function swac_composition_tag_shortcode() {
         }
 
         $output .= sprintf(
-            '<a href="%s" class="swac-salt-tag wa-salt-tag pd-salt-tag">🧪 %s</a>',
+            '<a href="%s" class="swac-salt-tag wa-salt-tag pd-salt-tag">%s</a>',
             esc_url($term_link),
             esc_html($term->name)
         );
@@ -54,6 +54,7 @@ function swac_composition_tag_shortcode() {
     return $output;
 }
 add_shortcode('swac_composition_tag', 'swac_composition_tag_shortcode');
+add_shortcode('g1_composition_tag', 'swac_composition_tag_shortcode');
 
 /**
  * Regulatory Rx Badge Shortcode: [swac_rx_badge]

@@ -7,6 +7,7 @@
  *  - text     : Button label (default: 'Order on WhatsApp')
  *  - message  : Pre-filled text passed to WhatsApp (default: 'Hello ' . get_bloginfo('name') . '.')
  *  - fullwidth: 'yes' | 'no' (default: 'no')
+ *  - icon     : 'yes' | 'no' (default: 'yes')
  *
  * @package StatelessWaCommerce
  */
@@ -44,6 +45,7 @@ if (!function_exists('swac_button_shortcode')) {
             'text'      => __('Order on WhatsApp', 'stateless-wa-commerce'),
             'message'   => $default_msg,
             'fullwidth' => 'no',
+            'icon'      => 'yes',
         ], is_array($atts) ? $atts : [], 'swac_button');
 
         $text = !empty($parsed_atts['text']) ? esc_html($parsed_atts['text']) : __('Contact Us', 'stateless-wa-commerce');
@@ -55,6 +57,8 @@ if (!function_exists('swac_button_shortcode')) {
         $fw_val = strtolower((string)($parsed_atts['fullwidth'] ?? ''));
         $fullwidth = ($fw_val === 'yes' || $fw_val === 'true');
 
+        $show_icon = !in_array(strtolower((string)($parsed_atts['icon'] ?? 'yes')), ['no', 'false', '0', 'none'], true);
+
         $wa_url = function_exists('swac_build_whatsapp_url')
             ? swac_build_whatsapp_url($message, $base_url)
             : $base_url . ((strpos($base_url, '?') !== false) ? '&' : '?') . 'text=' . rawurlencode($message);
@@ -64,16 +68,33 @@ if (!function_exists('swac_button_shortcode')) {
             $class_name .= ' swac-btn--fullwidth';
         }
 
-        $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
+        $svg_icon = ($show_icon && (function_exists('swac_icon_svg') || function_exists('cdr_wa_icon_svg')))
+            ? (function_exists('swac_icon_svg') ? swac_icon_svg() : cdr_wa_icon_svg())
+            : '';
 
         return sprintf(
             '<a href="%s" target="_blank" rel="noopener noreferrer" class="%s">%s<span>%s</span></a>',
             esc_url($wa_url),
             esc_attr($class_name),
-            $icon,
+            $svg_icon,
             $text
         );
     }
 }
 
 add_shortcode('swac_button', 'swac_button_shortcode');
+add_shortcode('cdr_whatsapp_button', 'swac_button_shortcode');
+
+if (!function_exists('cdr_whatsapp_button_shortcode')) {
+    /**
+     * Backward-compatibility alias for WhatsApp button shortcode handler.
+     *
+     * @param array|string $atts
+     * @param string|null  $content
+     * @return string
+     */
+    function cdr_whatsapp_button_shortcode($atts = [], ?string $content = null): string
+    {
+        return swac_button_shortcode($atts, $content);
+    }
+}

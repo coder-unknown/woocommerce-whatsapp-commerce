@@ -20,7 +20,7 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)) . '/');
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.2.1');
+    define('SWAC_VERSION', '1.2.2');
 }
 
 

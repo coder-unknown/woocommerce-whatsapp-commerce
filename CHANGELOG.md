@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.2] — 2026-10-03
+
+### Added
+- **Delivery Cutoff Calendar Date Stamping** (`core/delivery-cutoff.php`, `assets/js/wa_cart.js`):
+  - Added dynamic `(j M)` calendar date stamping to delivery cutoff notices and WhatsApp order estimates (e.g. `Order now to get it by Monday (5 Oct)` and `Tomorrow (6 Oct)`).
+  - Added client-side date calculation helper `getKolkataFormattedDate()` for responsive hydration on static cached pages.
+- **WhatsApp Action Button Icon Toggle** (`frontend/components/whatsapp-button.php`):
+  - Added `icon="yes|no"` attribute to `[swac_button]` (and `[cdr_whatsapp_button]`) to allow suppressing the WhatsApp SVG icon when using custom leading emojis or text.
+- **Backward Compatibility Aliases**:
+  - Registered legacy aliases `[g1_delivery_notice]`, `[g1_composition_tag]`, `[cdr_whatsapp_button]`, `[cdr_generic_box]`, and `[g1_generic_box]`.
+  - Added function aliases `g1_get_delivery_cutoff_message()`, `cdr_whatsapp_button_shortcode()`, and `cdr_generic_box_html()`.
+
+### Fixed
+- **Composition & Generic Badge Clean Markup** (`modules/pharmacy/product-meta.php`, `modules/pharmacy/generic-upsell.php`):
+  - Removed emoji prefix (`🧪`) from pharmaceutical active salt links and generic comparison cards for cleaner typography and badge styling.
+- **Loyalty Gift Emoji Spacing & Italic Alignment** (`assets/js/wa_cart.js`, `assets/css/cart-drawer.css`):
+  - Wrapped loyalty gift emoji (`🎁`) inside `.cdr-loyalty-gift-icon` with `font-style: normal` to prevent italic font slanting overlap.
+  - Normalized spacing after the loyalty gift emoji in generated WhatsApp order summary messages.
+
 ## [1.2.1] — 2026-09-30
 
 ### Added

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Stateless WhatsApp Commerce for WooCommerce
  * Description: Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce. Serving dynamic catalogs from full-page static cache.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: 0xCoderunknown
  * License: GPL-2.0-or-later
  * Text Domain: stateless-wa-commerce
@@ -214,7 +214,7 @@ add_action('wp_enqueue_scripts', function () {
             'loyalty'                   => $cfg['loyalty'],
             'timezone_offset'           => function_exists('wp_timezone') ? (float)((wp_timezone()->getOffset(new DateTime('now', new DateTimeZone('UTC')))) / 3600) : 0.0,
             'cutoff_messages'           => [
-                'weekend'   => __('Order now to receive it by Monday', 'stateless-wa-commerce'),
+                'weekend'   => __('Order now to get it by Monday', 'stateless-wa-commerce'),
                 'morning'   => __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce'),
                 'afternoon' => __('Order now to receive it by tomorrow', 'stateless-wa-commerce'),
             ],
