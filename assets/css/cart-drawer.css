@@ -1,0 +1,1000 @@
+/**
+ * 🛒 FRONTEND ASSET: WHATSAPP CART DRAWER & ADDRESS SUBSYSTEM STYLES
+ * File: assets/css/cart-drawer.css
+ * Enqueued: stateless-wa-commerce.php -> wp_enqueue_scripts ('swac-cart-drawer-style')
+ * Interacts with: assets/js/wa_cart.js & frontend/components/cart-drawer.php
+ *
+ * @package StatelessWaCommerce
+ */
+
+/* ─── Floating WhatsApp Cart Bubble ──────────────────────────────────────── */
+
+.swac-cart-bubble {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 0 20px 0 16px;
+    height: 52px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(37, 211, 102, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.swac-cart-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5);
+}
+
+.swac-cart-bubble svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.swac-cart-count {
+    background: #fff;
+    color: #128C7E;
+    font-size: 12px;
+    font-weight: 800;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    margin-left: 2px;
+}
+
+@media (max-width: 480px) {
+    .swac-cart-bubble {
+        bottom: 16px;
+        right: 14px;
+        height: 48px;
+        padding: 0 14px 0 12px;
+        font-size: 14px;
+    }
+
+    .swac-cart-bubble-label {
+        display: none;
+        /* Show only icon + count on tiny screens */
+    }
+}
+
+/* ─── WhatsApp Cart Drawer ───────────────────────────────────────────────── */
+
+.swac-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+}
+
+.swac-drawer {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: min(380px, 95vw);
+    height: 100dvh;
+    background: #fff;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.18);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px 0 0 12px;
+}
+
+.swac-drawer--open {
+    right: 0;
+}
+
+.swac-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    background: #f9fafb;
+    border-radius: 12px 0 0 0;
+    gap: 10px;
+}
+
+.swac-drawer-header span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.swac-drawer-header svg {
+    width: 20px;
+    height: 20px;
+    fill: #25D366;
+    flex-shrink: 0;
+}
+
+.swac-drawer-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    line-height: 1;
+}
+
+.swac-drawer-close:hover {
+    background: #f3f4f6;
+    color: #111;
+}
+
+.swac-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.swac-drawer-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px 0;
+    font-size: 14px;
+}
+
+/* Individual item row */
+.swac-drawer-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.swac-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.swac-item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.swac-item-price {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.swac-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.swac-qty-btn {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151;
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.swac-qty-btn:hover {
+    background: #f3f4f6;
+}
+
+.swac-item-qty {
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    color: #111;
+}
+
+.swac-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    line-height: 1;
+}
+
+.swac-remove-btn:hover {
+    background: #fef2f2;
+}
+
+/* Drawer footer */
+.swac-drawer-footer {
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f9fafb;
+    border-radius: 0 0 0 12px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 2;
+}
+
+.swac-order-note {
+    font-size: 11px;
+    line-height: 1.4;
+    color: #6b7280;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.swac-send-order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.swac-send-order-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.swac-send-order-btn:hover {
+    background: #128C7E;
+    transform: translateY(-1px);
+}
+
+.swac-clear-btn {
+    background: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s;
+}
+
+.swac-clear-btn:hover {
+    background: #f3f4f6;
+    color: #111;
+}
+
+/* Inline Cart Clear Confirmation */
+.swac-clear-confirm {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: swacClearFadeIn 0.2s ease-out;
+}
+
+.swac-clear-confirm-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #991b1b;
+    text-align: center;
+}
+
+.swac-clear-confirm-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.swac-clear-cancel-btn,
+.swac-clear-proceed-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.swac-clear-cancel-btn {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.swac-clear-cancel-btn:hover {
+    background: #f3f4f6;
+}
+
+.swac-clear-proceed-btn {
+    background: #dc2626;
+    color: #fff;
+}
+
+.swac-clear-proceed-btn:hover {
+    background: #b91c1c;
+}
+
+@keyframes swacClearFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Loyalty Card (4-state machine) ────────────────────────────────────── */
+
+/* Base card */
+.swac-loyalty-card {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-width: 1.5px;
+    border-style: solid;
+}
+
+/* STATE 0: below free delivery threshold — sky blue delivery nudge */
+.swac-loyalty-card--shipping {
+    background: #f0f9ff;
+    border-color: #7dd3fc;
+}
+
+.swac-loyalty-card--shipping .swac-loyalty-body {
+    color: #0c4a6e;
+}
+
+/* STATE 1/4: below threshold — amber nudge */
+.swac-loyalty-card--nudge {
+    background: #fff8e1;
+    border-color: #f0a500;
+}
+
+/* STATE 2: offer available — green action */
+.swac-loyalty-card--offer {
+    background: #f0fff4;
+    border-color: #25D366;
+}
+
+/* STATE 3: offer accepted — confirmed green */
+.swac-loyalty-card--confirmed {
+    background: #e8f5e9;
+    border-color: #25D366;
+}
+
+/* STATE 4: admin disabled notice */
+.swac-loyalty-card--admin-disabled {
+    background: #fffbeb;
+    border-color: #d97706;
+    border-style: dashed;
+}
+
+.swac-loyalty-card--admin-disabled .swac-loyalty-heading {
+    color: #b45309;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.swac-loyalty-card--admin-disabled .swac-loyalty-body {
+    color: #92400e;
+    font-size: 12px;
+}
+
+.swac-loyalty-card--admin-disabled code {
+    background: #fef3c7;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #78350f;
+}
+
+.swac-loyalty-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #166534;
+}
+
+.swac-loyalty-body {
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.swac-loyalty-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.swac-loyalty-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    line-height: 1;
+}
+
+.swac-loyalty-btn--yes {
+    background: #25D366;
+    color: #fff;
+    border: none;
+}
+
+.swac-loyalty-btn--yes:hover {
+    background: #1ebe5d;
+}
+
+/* Remove button: low-emphasis outlined red */
+.swac-loyalty-btn--remove {
+    background: transparent;
+    color: #e74c3c;
+    border: 1.5px solid #e74c3c;
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.swac-loyalty-btn--remove:hover {
+    background: #fef2f2;
+}
+
+/* ─── Cart Totals Block ──────────────────────────────────────────────────── */
+
+.swac-totals-block {
+    border-top: 1px solid #e5e7eb;
+    margin-top: 4px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.swac-totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #374151;
+}
+
+.swac-totals-save {
+    color: #15803d;
+    font-weight: 600;
+}
+
+.swac-totals-loyalty {
+    color: #166534;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.swac-totals-payable {
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: #111;
+    border-top: 1px dashed #d1d5db;
+    padding-top: 6px;
+    margin-top: 2px;
+}
+
+.swac-totals-free {
+    color: #15803d;
+    font-weight: 700;
+}
+
+/* ─── Drawer Delivery Info: Area Badge + Dynamic Cutoff ──────────────────── */
+.swac-drawer-delivery-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #fbfbf9;
+    border: 1px solid #edebe4;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    box-sizing: border-box;
+}
+
+.swac-drawer-area-badge {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.swac-drawer-delivery-cutoff {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2e3c38;
+    line-height: 1.4;
+}
+
+.swac-drawer-delivery-cutoff .swac-drawer-cutoff-text {
+    color: #2e3c38;
+}
+
+/* ─── Persistent Delivery Address Section ────────────────────────────────── */
+.swac-address-section {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Returning State Preview Card */
+.swac-address-card {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.swac-address-card:hover {
+    border-color: #cbd5e1;
+}
+
+.swac-address-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.swac-address-card-badge {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.swac-address-edit-btn {
+    background: none;
+    border: none;
+    color: #0284c7;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.swac-address-edit-btn:hover {
+    background: #e0f2fe;
+    color: #0369a1;
+    text-decoration: underline;
+}
+
+.swac-address-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.swac-address-card-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.swac-address-card-text {
+    font-size: 12.5px;
+    color: #334155;
+    line-height: 1.4;
+}
+
+.swac-address-card-sub {
+    font-size: 11.5px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Collapsible / Edit Form */
+.swac-address-form {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    animation: swacClearFadeIn 0.2s ease-out;
+}
+
+.swac-address-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+
+.swac-address-form-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.swac-address-cancel-btn,
+.swac-address-collapse-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.swac-address-cancel-btn:hover,
+.swac-address-collapse-btn:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+.swac-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.swac-form-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.swac-form-req {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.swac-form-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #1e293b;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+    font-family: inherit;
+}
+
+.swac-form-input::placeholder {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.swac-form-input:focus {
+    background: #fff;
+    border-color: #25D366;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+}
+
+.swac-form-input.swac-input-error {
+    border-color: #ef4444 !important;
+    background: #fff8f8 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+    animation: swacInputShake 0.3s ease-in-out;
+}
+
+.swac-form-error-msg {
+    font-size: 11px;
+    color: #ef4444;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* ─── Pincode Serviceability Status Badges ──────────────────────────────── */
+.swac-pincode-status {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: swacClearFadeIn 0.2s ease-out;
+}
+
+.swac-pincode-status.swac-pin-success {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.swac-pincode-status.swac-pin-warning {
+    background-color: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.swac-pincode-status.swac-pin-error {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.swac-form-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #334155;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 2px;
+}
+
+.swac-form-checkbox-label input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #25D366;
+    cursor: pointer;
+}
+
+@keyframes swacInputShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    20%, 60% {
+        transform: translateX(-3px);
+    }
+    40%, 80% {
+        transform: translateX(3px);
+    }
+}
+
+/* ─── Address Form Action Buttons & Save Workflow ────────────────────────── */
+.swac-address-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.swac-btn-save-address {
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 40px;
+    padding: 0 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
+    font-family: inherit;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.swac-btn-save-address:hover {
+    background: #1e293b;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.swac-btn-save-address:active {
+    transform: scale(0.98);
+}
+
+.swac-btn-cancel-address {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: color 0.15s, background-color 0.15s;
+    font-family: inherit;
+}
+
+.swac-btn-cancel-address:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+/* Inline '✓ Saved' Micro-badge */
+.swac-address-saved-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1.5px 7px;
+    border-radius: 12px;
+    margin-left: 6px;
+    letter-spacing: normal;
+    text-transform: none;
+    animation: swacSavedBadgeFade 2.5s ease-out forwards;
+}
+
+@keyframes swacSavedBadgeFade {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    15% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-2px);
+    }
+}
+
+/* Add Delivery Address Collapsed Button */
+.swac-address-add-prompt {
+    margin-top: 2px;
+}
+
+.swac-address-add-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #0f766e;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.swac-address-add-btn:hover {
+    background: #f0fdfa;
+    border-color: #0d9488;
+    color: #0f766e;
+}
+
+.swac-address-add-icon {
+    font-size: 14px;
+}
+
+.swac-address-add-text {
+    font-size: 12.5px;
+}
+
+/* ─── Cart Alert / Toast Notification ────────────────────────────────────── */
+.swac-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1e293b;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.45;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+    z-index: 1000002;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-width: 90vw;
+    width: max-content;
+    text-align: center;
+}
+
+.swac-toast--visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.swac-qty-btn:disabled,
+.swac-qty-btn.swac-qty-btn--disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}

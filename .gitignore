@@ -1,0 +1,50 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Editor & IDE Directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Build & Dependency Artifacts
+node_modules/
+vendor/
+composer.phar
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.bak
+*.cache
+.phpunit.result.cache
+
+# Archives & Packages
+*.zip
+*.tar.gz
+
+# Environment & Secrets
+.env
+.env.*
+*.env
+
+# Development Sandbox
+playground.php
+
+# Internal / Dev Files (not for public release)
+checklist.md
+AI_CONTEXT.md
+
+# Build Output
+/build/
+/dist/

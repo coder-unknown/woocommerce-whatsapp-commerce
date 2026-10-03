@@ -1,0 +1,615 @@
+/**
+ * 💊 PHARMACY MODULE STYLESHEET
+ * File: assets/css/modules/pharmacy.css
+ * Enqueued: Conditionally when pharmacy module is active
+ * Scope: Composition tags, generic medicine comparisons & badges, size charts, salts directory.
+ *
+ * @package StatelessWaCommerce
+ */
+
+/* =========================================
+   1. GENERIC PRODUCT LOOP CARD & BADGE
+   ========================================= */
+body:not(.home):not(.front-page) .woocommerce ul.products li.product.is-generic,
+body:not(.home):not(.front-page) ul.products li.product.is-generic {
+    border: 1px solid #E0942C !important;
+    box-shadow: 0 4px 14px rgba(224, 148, 44, 0.12) !important;
+}
+
+:is(.woocommerce ul.products li.product, ul.products li.product, .pd-card) {
+    position: relative;
+}
+
+.swac-generic-badge,
+.wa-generic-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 9;
+    background: #E0942C;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(224, 148, 44, 0.35);
+    pointer-events: none;
+    display: inline-block;
+}
+
+body:is(.home, .front-page) :is(.swac-generic-badge, .wa-generic-badge) {
+    display: none !important;
+}
+
+/* Loop Composition (shown on generic archive) */
+.swac-loop-composition {
+    font-size: 0.73rem;
+    color: #2a7d9c;
+    font-style: italic;
+    margin: 1px 0 3px 0;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+}
+
+/* =========================================
+   2. COMPOSITION TAG (.wa-composition-tag, .pd-salt-tag)
+   ========================================= */
+.wa-composition-tag,
+.pd-salt-tag,
+a.pd-salt-tag,
+a.pd-salt-tag:link,
+a.pd-salt-tag:visited,
+a.pd-salt-tag:hover,
+a.pd-salt-tag:focus,
+.pd-salt-tag * {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    margin-bottom: 20px;
+    max-width: 100%;
+    word-break: break-word;
+    background: var(--wa-accent, #0E6B5C);
+    color: #ffffff !important;
+}
+
+/* =========================================
+   3. RX REGULATORY BADGE ([wa_rx_badge])
+   ========================================= */
+.wa-rx-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #c53030;
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    vertical-align: middle;
+    margin-right: 6px;
+    user-select: none;
+}
+
+.wa-rx-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    vertical-align: middle;
+}
+
+.wa-rx-brand {
+    font-size: 14px;
+    font-weight: 600;
+    color: #667670;
+    word-spacing: 0.05em;
+    line-height: 1;
+}
+
+/* =========================================
+   4. GENERIC SPOTLIGHT (HONEST PRICING / UPSELL BOX)
+   ========================================= */
+.swac-spotlight-alternate-lg {
+    background: #FDF3E4;
+    border: 1px solid #EE9A2A;
+    border-radius: 13px;
+    padding: 28px;
+    margin-bottom: 40px;
+    box-shadow: 0 6px 20px rgba(224, 148, 44, 0.08);
+}
+
+.swac-spotlight-eyebrow {
+    display: inline-block;
+    background: #E0942C;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.swac-spotlight-header-lg h2,
+.swac-spotlight-header-lg h3 {
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: 600;
+    color: #8A5A16;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    line-height: 1.25;
+    margin: 4px 0 6px 0;
+}
+
+.swac-shortcode-wrapper .swac-spotlight-header-lg h2 .swac-savings-amount,
+.swac-shortcode-wrapper .swac-spotlight-header-lg h3 .swac-savings-amount,
+.swac-spotlight-header-lg .swac-savings-amount {
+    color: #0E6B5C;
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.swac-spotlight-header-lg p {
+    font-size: 14px;
+    color: #9C6A1F;
+    margin: 0 0 16px 0;
+}
+
+.swac-alternate-card-lg {
+    background: #FFFFFF;
+    border: 1.5px solid #F0D9AE;
+    border-radius: 13px;
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    min-height: 120px;
+}
+
+.swac-alt-thumb-lg {
+    width: 180px;
+    flex-shrink: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.swac-alt-thumb-lg img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    margin: 8px 0;
+    padding: 0;
+    display: block;
+}
+
+.swac-alt-info-lg {
+    flex: 1;
+    min-width: 160px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1.5px solid #F0D9AE;
+}
+
+.swac-alt-info-lg h3 {
+    font-family: inherit;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0 0 6px 0;
+}
+
+.swac-alt-info-lg h3 a {
+    color: #23302D;
+    text-decoration: none;
+}
+
+.swac-alt-info-lg .swac-alt-salt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #0E6B5C;
+    color: #ffffff;
+    margin-bottom: 8px;
+    width: fit-content;
+}
+
+.swac-alt-info-lg .swac-alt-meta-line {
+    font-size: 13.5px;
+    color: #667670;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.swac-alt-action-box {
+    text-align: right;
+    background: #FAF8F4;
+    padding: 20px 24px;
+    min-width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.swac-cmp-item.swac-cmp-main {
+    font-size: 13px !important;
+    color: #667670 !important;
+    margin-bottom: 6px;
+}
+
+.swac-cmp-item.swac-cmp-main .swac-cmp-val,
+.swac-cmp-item.swac-cmp-main .swac-cmp-val .woocommerce-Price-amount,
+.swac-cmp-item.swac-cmp-main .swac-cmp-val .woocommerce-Price-currencySymbol,
+.swac-cmp-item.swac-cmp-main .swac-cmp-val bdi {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #667670 !important;
+    display: inline;
+}
+
+.swac-cmp-item.swac-cmp-main .swac-cmp-val s,
+.swac-cmp-item.swac-cmp-main .swac-cmp-val del {
+    text-decoration: line-through;
+}
+
+.swac-cmp-item.swac-cmp-alt {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #0E6B5C !important;
+    padding-top: 8px;
+    margin-bottom: 14px;
+    border-top: 1px dashed #E5E0D6;
+}
+
+.swac-cmp-item.swac-cmp-alt .swac-cmp-val,
+.swac-cmp-item.swac-cmp-alt .swac-cmp-val .woocommerce-Price-amount,
+.swac-cmp-item.swac-cmp-alt .swac-cmp-val .woocommerce-Price-currencySymbol,
+.swac-cmp-item.swac-cmp-alt .swac-cmp-val bdi {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #0E6B5C !important;
+    white-space: nowrap;
+    display: inline;
+}
+
+.swac-btn-alt-lg {
+    display: block;
+    background: #0E6B5C;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.swac-btn-alt-lg:hover {
+    background: #0A4A40;
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.swac-btn-alt-lg .swac-btn-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.swac-btn-alt-lg:hover .swac-btn-arrow {
+    transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+    .swac-alternate-card-lg {
+        flex-direction: column;
+    }
+
+    .swac-alt-thumb-lg {
+        width: 100%;
+        max-height: 180px;
+        flex-shrink: 1;
+    }
+
+    .swac-alt-info-lg {
+        min-width: unset;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1.5px solid #F0D9AE;
+    }
+
+    .swac-alt-action-box {
+        width: 100%;
+        min-width: unset;
+        text-align: left;
+    }
+
+    .swac-btn-alt-lg {
+        width: 100%;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   5. SIZE CHART ACCORDION ([swac_size_chart])
+   ========================================= */
+.swac-size-chart-accordion,
+.wa-size-chart-accordion {
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    background: #ffffff;
+    margin-top: 15px;
+    overflow: hidden;
+    width: 100%;
+    flex-basis: 100%;
+    order: 5;
+}
+
+.swac-size-chart-accordion[open],
+.wa-size-chart-accordion[open] {
+    border-color: #2E7A8C;
+}
+
+.swac-size-chart-summary {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    cursor: pointer;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none;
+    outline: none;
+    transition: background 0.2s ease;
+}
+
+.swac-size-chart-summary::-webkit-details-marker {
+    display: none;
+}
+
+.swac-size-chart-summary::after {
+    content: "▼";
+    font-size: 10px;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+
+.swac-size-chart-accordion[open] .swac-size-chart-summary::after,
+.wa-size-chart-accordion[open] .swac-size-chart-summary::after {
+    transform: rotate(180deg);
+}
+
+.swac-size-chart-accordion[open] .swac-size-chart-summary,
+.wa-size-chart-accordion[open] .swac-size-chart-summary {
+    background: #f0f7f9;
+    color: #2E7A8C;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.swac-size-chart-content {
+    padding: 16px;
+}
+
+.swac-size-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+
+.swac-size-table th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 2px solid #ddd;
+    font-weight: bold;
+}
+
+.swac-size-table td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.swac-size-note {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+/* =========================================
+   6. EXPLORE SALTS DIRECTORY ([swac_explore_salts])
+   ========================================= */
+.swac-letter-section {
+    margin-bottom: 40px;
+}
+
+.swac-letter-heading {
+    font-size: 28px;
+    color: #0E6B5C;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+.swac-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--swac-salt-cols, 4), 1fr);
+    gap: 16px;
+}
+
+.swac-grid-item {
+    min-width: 0;
+}
+
+.swac-salt-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.swac-salt-card:hover,
+.swac-salt-card:focus-within {
+    border-color: #0E6B5C;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -4px rgba(14, 107, 92, 0.16), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+.swac-salt-card a.swac-salt-banner {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+}
+
+.swac-salt-banner-header {
+    background: linear-gradient(135deg, #0E6B5C 0%, #16806f 100%);
+    color: #ffffff;
+    padding: 20px 16px;
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease;
+}
+
+.swac-salt-card:hover .swac-salt-banner-header,
+.swac-salt-card:focus-within .swac-salt-banner-header {
+    background: linear-gradient(135deg, #0A4A40 0%, #0E6B5C 100%);
+}
+
+.swac-salt-banner-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+.swac-salt-banner-footer {
+    padding: 11px 16px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f1f5f9;
+    margin-top: auto;
+}
+
+.swac-salt-banner-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 3px 9px;
+    border-radius: 20px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.swac-salt-card:hover .swac-salt-banner-count,
+.swac-salt-card:focus-within .swac-salt-banner-count {
+    background: #EAF3F1;
+    color: #0E6B5C;
+}
+
+.swac-salt-banner-arrow {
+    font-size: 14px;
+    color: #0E6B5C;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.swac-salt-card:hover .swac-salt-banner-arrow,
+.swac-salt-card:focus-within .swac-salt-banner-arrow {
+    transform: translateX(4px);
+}
+
+@media (max-width: 991px) {
+    .swac-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+    }
+}
+
+@media (max-width: 640px) {
+    .swac-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .swac-salt-banner-header {
+        min-height: 74px;
+        padding: 12px 10px;
+    }
+
+    .swac-salt-banner-title {
+        font-size: 13px;
+    }
+
+    .swac-salt-banner-footer {
+        padding: 9px 12px;
+    }
+
+    .swac-salt-banner-count {
+        font-size: 11px;
+        padding: 2px 7px;
+    }
+}
+
+@media (max-width: 360px) {
+    .swac-grid {
+        grid-template-columns: 1fr;
+    }
+}

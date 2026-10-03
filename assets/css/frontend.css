@@ -1,0 +1,535 @@
+/**
+ * 🎨 FRONTEND ASSET: GLOBAL CORE STYLESHEET
+ * File: assets/css/frontend.css
+ * Enqueued: stateless-wa-commerce.php -> wp_enqueue_scripts ('wa-frontend-style')
+ * Scope: Complete core frontend styling: product loop badges, price hierarchies,
+ *        action rows & quantity controls, delivery cutoff notices, and layout utilities.
+ *
+ * @package StatelessWaCommerce
+ */
+
+:root {
+    --wa-brand: #25D366;
+    --wa-brand-dark: #128C7E;
+    --wa-brand-darker: #075E54;
+    --wa-accent: #0E6B5C;
+    --wa-ink: #23302D;
+    --wa-ink-muted: #667670;
+    --wa-save: #D5572B;
+    --wa-save-tint: #FBEAE3;
+    --wa-line: #E5E0D6;
+    --wa-radius: 8px;
+}
+
+/* =========================================
+   1. GLOBAL PRODUCT LOOP STYLES
+   ========================================= */
+
+/* Brand Name Display */
+.swac-loop-brand-title,
+.wa-product-brand {
+    font-size: 0.70rem;
+    color: var(--wa-ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 4px 0;
+    display: block;
+}
+
+/* Custom Out of Stock Loop Button */
+.swac-out-of-stock-btn,
+.wa-out-of-stock-btn {
+    display: block;
+    padding: 8px 10px;
+    background-color: #f5f5f5;
+    color: #888;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 10px;
+    pointer-events: none;
+}
+
+/* =========================================
+   2. WHATSAPP ACTION BUTTONS ([swac_button])
+   ========================================= */
+.swac-button,
+.swac-btn,
+.wa-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--wa-brand-dark);
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    padding: 10px 18px;
+    border-radius: var(--wa-radius);
+    border: 1px solid var(--wa-brand-dark);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.swac-button:hover,
+.swac-btn:hover,
+.wa-button:hover {
+    background-color: var(--wa-brand-darker);
+    border-color: var(--wa-brand-darker);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(18, 140, 126, 0.35);
+    text-decoration: none;
+}
+
+.swac-button:focus-visible,
+.swac-btn:focus-visible,
+.wa-button:focus-visible {
+    outline: 2px solid var(--wa-brand);
+    outline-offset: 2px;
+}
+
+.swac-button:active,
+.swac-btn:active,
+.wa-button:active {
+    background-color: var(--wa-brand-darker);
+    border-color: var(--wa-brand-darker);
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(7, 94, 84, 0.25);
+}
+
+.swac-button--fullwidth,
+.swac-btn--fullwidth,
+.wa-button--fullwidth {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.swac-button svg,
+.swac-btn svg,
+.wa-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   3. PRICING BLOCK (SHARED & SINGLE HIERARCHY)
+   ========================================= */
+.pd-price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.wa-price-now,
+.pd-price-now,
+.pd-price-now .woocommerce-Price-amount {
+    font-weight: 700;
+    color: var(--wa-ink);
+    line-height: 1.2;
+}
+
+.pd-price-mrp {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--wa-ink-muted);
+    display: inline;
+}
+
+.pd-price-mrp .pd-mrp-strike {
+    display: inline;
+    text-decoration: line-through;
+    color: var(--wa-ink-muted);
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.pd-price-mrp .pd-mrp-strike .woocommerce-Price-amount,
+.pd-price-mrp .pd-mrp-strike .woocommerce-Price-currencySymbol,
+.pd-price-mrp .pd-mrp-strike bdi {
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--wa-ink-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--wa-ink-muted);
+}
+
+.pd-price-off {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--wa-save);
+    background: var(--wa-save-tint);
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* 🛍️ Archive Grid Cards (Compact) */
+:is(.pd-card, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-container,
+.pd-card-price-container {
+    display: flex !important;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+:is(.pd-card, .pd-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-now {
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: var(--wa-ink) !important;
+    line-height: 1.2;
+}
+
+:is(.pd-card, .pd-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.pd-price-mrp, .pd-price-mrp .pd-mrp-strike) {
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    text-decoration: line-through;
+    text-decoration-color: #64748b;
+    line-height: 1.2;
+    display: inline;
+}
+
+.pd-card-price-container .pd-price-mrp,
+.pd-card-price-container .pd-price-mrp .pd-mrp-strike,
+.pd-card-price-container .pd-price-mrp .woocommerce-Price-amount {
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    line-height: 1.2;
+}
+
+.pd-card-price-container .pd-price-mrp :is(bdi, .woocommerce-Price-currencySymbol) {
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+:is(.pd-card, .pd-card-price-container, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-off {
+    font-size: 12px !important;
+    font-weight: 700;
+    color: var(--wa-save) !important;
+    background: var(--wa-save-tint);
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    text-transform: uppercase;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* 🏷️ Single Product Price & Pack Hierarchy Hero Styling */
+.wa-price-pack-wrap,
+.wa-pd-price-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) .pd-price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) :is(.pd-price-now, .pd-price-now .woocommerce-Price-amount, .pd-price-now .woocommerce-Price-currencySymbol, .pd-price-now bdi) {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: var(--wa-accent) !important;
+    line-height: 1;
+}
+
+:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) :is(.pd-price-mrp, .pd-price-mrp .pd-mrp-strike, .pd-price-mrp .pd-mrp-strike .woocommerce-Price-amount, .pd-price-mrp .pd-mrp-strike .woocommerce-Price-currencySymbol, .pd-price-mrp .pd-mrp-strike bdi) {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: var(--wa-ink-muted) !important;
+    display: inline;
+    text-decoration: line-through;
+    text-decoration-color: var(--wa-ink-muted);
+}
+
+:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) .pd-price-off {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--wa-save);
+    background: var(--wa-save-tint);
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.wa-pack-size,
+.pd-pack-size {
+    font-size: 13.5px;
+    color: var(--wa-ink-muted);
+    margin-bottom: 16px;
+}
+
+:is(.wa-pack-size, .pd-pack-size) strong {
+    color: var(--wa-ink);
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* =========================================
+   4. ACTION ROW & QUANTITY CONTROLS ([swac_action_row])
+   ========================================= */
+.swac-action-row,
+.wa-action-row,
+.pd-action-row {
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap !important;
+}
+
+.swac-qty-selector,
+.wa-qty-selector,
+.pd-qty-selector {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--wa-line);
+    border-radius: var(--wa-radius);
+    overflow: hidden;
+    height: 48px;
+    background: #fff;
+}
+
+.swac-qty-btn,
+.wa-qty-btn,
+.pd-qty-minus,
+.pd-qty-plus {
+    background: #f8fafc;
+    border: none;
+    width: 40px;
+    height: 100%;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    transition: background 0.15s ease;
+}
+
+.swac-qty-btn:hover,
+.wa-qty-btn:hover,
+.pd-qty-minus:hover,
+.pd-qty-plus:hover {
+    background: #e2e8f0;
+}
+
+.swac-qty-input,
+.wa-qty-input,
+.pd-qty-input {
+    width: 50px;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--wa-ink);
+    padding: 0;
+    -moz-appearance: textfield;
+}
+
+.swac-qty-input::-webkit-outer-spin-button,
+.swac-qty-input::-webkit-inner-spin-button,
+.wa-qty-input::-webkit-outer-spin-button,
+.wa-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.swac-single-add-btn,
+.wa-single-add-btn,
+.pd-add-to-order-btn {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+    background: var(--wa-accent);
+    color: #ffffff !important;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    height: 48px;
+    padding: 0 24px;
+    border-radius: var(--wa-radius);
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    white-space: nowrap;
+}
+
+.swac-single-add-btn:hover,
+.wa-single-add-btn:hover,
+.pd-add-to-order-btn:hover {
+    background: var(--wa-brand-darker);
+    transform: translateY(-1px);
+}
+
+:is(.swac-single-add-btn, .wa-single-add-btn).swac-btn-added {
+    background: #15803d;
+    color: #fff;
+    pointer-events: none;
+}
+
+.swac-single-add-btn svg,
+.wa-single-add-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   5. DELIVERY NOTICE BADGE ([swac_delivery_notice])
+   ========================================= */
+.swac-delivery-notice,
+.wa-delivery-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: 100% !important;
+    flex-basis: 100% !important;
+    order: 3;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    background: #fbfbf9;
+    border: 1px solid #edebe4;
+    border-radius: 6px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.swac-delivery-notice .swac-delivery-icon,
+.wa-delivery-notice .wa-delivery-icon {
+    font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
+    color: #d97706;
+}
+
+.swac-delivery-notice .swac-delivery-text,
+.wa-delivery-notice .wa-delivery-text {
+    font-weight: 500;
+    color: #2e3c38;
+}
+
+/* =========================================
+   6. STOCK BADGES & NOTICES
+   ========================================= */
+.swac-single-stock-notice-wrapper {
+    margin: 10px 0;
+    width: 100%;
+}
+
+p.stock.out-of-stock,
+div.stock.out-of-stock {
+    display: inline-block;
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.swac-sp-notice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid transparent;
+    border-left-width: 5px;
+    box-sizing: border-box;
+    width: 100%;
+    flex-basis: 100%;
+    order: 4;
+}
+
+.swac-sp-notice.swac-notice-oos {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    border-left-color: #64748b;
+    color: #334155;
+    font-weight: 500;
+}
+
+.swac-sp-notice.swac-notice-nr {
+    background: #fffbeb;
+    border-color: #fde68a;
+    border-left-color: #d97706;
+    color: #92400e;
+    font-weight: 500;
+}
+
+.swac-sp-notice .swac-notice-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* =========================================
+   7. LAYOUT UTILITIES
+   ========================================= */
+.swac-two-col-layout,
+.wa-two-col-layout {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.swac-col-left {
+    flex: 2;
+    min-width: 300px;
+}
+
+.swac-col-right {
+    flex: 1;
+    min-width: 280px;
+}
+
+.swac-single-col-margin--spaced {
+    margin-top: 30px;
+}
+
+.swac-shortcode-wrapper:empty {
+    display: none;
+}

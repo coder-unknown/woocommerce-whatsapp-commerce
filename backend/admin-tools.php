@@ -1,0 +1,158 @@
+<?php
+/**
+ * 🛠️ BACKEND: CATALOG AUDIT & MISSING IMAGES TOOL
+ *
+ * Shortcode: [swac_missing_images_finder]
+ *
+ * Provides a low-memory catalog diagnostic report identifying published products
+ * that lack featured thumbnails, prioritized by in-stock items.
+ *
+ * @package StatelessWaCommerce
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+if (!function_exists('swac_render_missing_images_finder')) {
+    /**
+     * Renders the missing product images audit interface.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string
+     */
+    function swac_render_missing_images_finder(array $atts = []): string
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            return '<p class="swac-tax-error">' . esc_html__('Access Denied: Insufficient Privileges.', 'stateless-wa-commerce') . '</p>';
+        }
+
+        $parsed_atts = shortcode_atts([
+            'limit' => 200,
+        ], $atts, 'swac_missing_images_finder');
+
+        $limit = max(1, min(1000, (int)$parsed_atts['limit']));
+
+        $args = [
+            'post_type'      => ['product'],
+            'post_status'    => 'publish',
+            'posts_per_page' => $limit,
+            'fields'         => 'ids',
+            'meta_query'     => [
+                'relation' => 'OR',
+                [
+                    'key'     => '_thumbnail_id',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_thumbnail_id',
+                    'value'   => ['', '0'],
+                    'compare' => 'IN',
+                ],
+            ],
+        ];
+
+        $product_ids = get_posts($args);
+
+        if (empty($product_ids)) {
+            return '<p style="color:#16a34a; font-weight:bold; padding:15px; background:#f0fdf4; border-radius:4px;">'
+                . esc_html__('🎉 Catalog in alignment: Zero products are missing featured images.', 'stateless-wa-commerce')
+                . '</p>';
+        }
+
+        // Prime caches to eliminate N+1 DB lookups
+        update_meta_cache('post', $product_ids);
+        update_object_term_cache($product_ids, 'product');
+
+        $audit_data = [];
+
+        foreach ($product_ids as $id) {
+            $product = wc_get_product($id);
+            if (!$product) {
+                continue;
+            }
+
+            $raw_sku = $product->get_sku();
+            $sku = !empty($raw_sku) ? esc_html($raw_sku) : '<span style="color:#94a3b8; font-style:italic;">' . esc_html__('No SKU', 'stateless-wa-commerce') . '</span>';
+            $name = $product->get_name();
+            $stock_status = $product->get_stock_status();
+            $edit_url = get_edit_post_link($id);
+
+            $sort_weight = ($stock_status === 'instock') ? 0 : 1;
+
+            $audit_data[] = [
+                'id'           => $id,
+                'sku'          => $sku,
+                'name'         => $name,
+                'stock_status' => $stock_status,
+                'edit_url'     => $edit_url,
+                'sort_weight'  => $sort_weight,
+            ];
+        }
+
+        usort($audit_data, function ($a, $b) {
+            return $a['sort_weight'] <=> $b['sort_weight'];
+        });
+
+        ob_start();
+        ?>
+        <div class="swac-image-audit-wrap wa-image-audit-wrap" style="padding:20px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; max-width:1100px; margin:20px auto; font-family:system-ui, -apple-system, sans-serif;">
+            <h3 style="margin-top:0; color:#0f172a; font-size:20px;">
+                <?php esc_html_e('⚠️ Product Image Audit Report', 'stateless-wa-commerce'); ?>
+            </h3>
+            <p style="color:#64748b; margin-bottom:20px; font-size:15px;">
+                <?php
+                echo sprintf(
+                    /* translators: %d: count of products missing images */
+                    esc_html__('Found %d items missing a featured thumbnail. Sorted by In Stock items first.', 'stateless-wa-commerce'),
+                    count($audit_data)
+                );
+                ?>
+            </p>
+            <table style="width:100%; border-collapse:collapse; font-size:14px; text-align:left;">
+                <thead>
+                    <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0;">
+                        <th style="padding:10px 12px;"><?php esc_html_e('ID', 'stateless-wa-commerce'); ?></th>
+                        <th style="padding:10px 12px;"><?php esc_html_e('SKU', 'stateless-wa-commerce'); ?></th>
+                        <th style="padding:10px 12px;"><?php esc_html_e('Product Name', 'stateless-wa-commerce'); ?></th>
+                        <th style="padding:10px 12px;"><?php esc_html_e('Stock Status', 'stateless-wa-commerce'); ?></th>
+                        <th style="padding:10px 12px;"><?php esc_html_e('Action', 'stateless-wa-commerce'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($audit_data as $row) : ?>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:10px 12px; color:#64748b;"><?php echo esc_html($row['id']); ?></td>
+                            <td style="padding:10px 12px; font-family:monospace;"><?php echo wp_kses_post($row['sku']); ?></td>
+                            <td style="padding:10px 12px; font-weight:500;">
+                                <a href="<?php echo esc_url($row['edit_url'] ?: '#'); ?>" target="_blank" style="color:#0284c7; text-decoration:none;">
+                                    <?php echo esc_html($row['name']); ?>
+                                </a>
+                            </td>
+                            <td style="padding:10px 12px;">
+                                <?php if ($row['stock_status'] === 'instock') : ?>
+                                    <span style="display:inline-block; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:600; background:#dcfce7; color:#15803d;">
+                                        <?php esc_html_e('In Stock', 'stateless-wa-commerce'); ?>
+                                    </span>
+                                <?php else : ?>
+                                    <span style="display:inline-block; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:600; background:#f1f5f9; color:#64748b;">
+                                        <?php esc_html_e('Out of Stock', 'stateless-wa-commerce'); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="padding:10px 12px;">
+                                <a href="<?php echo esc_url($row['edit_url'] ?: '#'); ?>" target="_blank" style="display:inline-block; padding:4px 10px; background:#0284c7; color:#fff; border-radius:4px; text-decoration:none; font-size:12px; font-weight:500;">
+                                    <?php esc_html_e('Upload Image', 'stateless-wa-commerce'); ?>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php
+        return (string)ob_get_clean();
+    }
+}
+
+add_shortcode('swac_missing_images_finder', 'swac_render_missing_images_finder');

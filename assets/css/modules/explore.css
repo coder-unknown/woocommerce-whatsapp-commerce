@@ -1,0 +1,274 @@
+/**
+ * 🗺️ EXPLORE DIRECTORY MODULE STYLESHEET
+ * File: assets/css/modules/explore.css
+ * Enqueued: Conditionally when explore module is active
+ * Scope: Shared live search hero, Brand directory grid, Category explorer grid.
+ *
+ * @package StatelessWaCommerce
+ */
+
+/* =========================================
+   1. SHARED SEARCH HERO UI
+   ========================================= */
+.swac-search-hero-section {
+    padding: 20px 0 40px 0;
+    width: 100%;
+}
+
+.swac-input-relative {
+    position: relative;
+    width: 100%;
+}
+
+#swac-salt-search,
+#swac-brand-search,
+.swac-cat-search-input,
+.swac-live-search,
+.wa-live-search {
+    width: 100%;
+    padding: 20px 25px 20px 60px;
+    font-size: 18px;
+    color: #333;
+    background-color: #fff;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+}
+
+#swac-salt-search:focus,
+#swac-brand-search:focus,
+.swac-cat-search-input:focus,
+.swac-live-search:focus,
+.wa-live-search:focus {
+    border-color: var(--wa-accent, #0E6B5C);
+    box-shadow: 0 0 0 4px rgba(14, 107, 92, 0.15), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.swac-search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+#swac-salt-search:focus + .swac-search-icon,
+#swac-brand-search:focus + .swac-search-icon,
+.swac-cat-search-input:focus + .swac-search-icon,
+.swac-live-search:focus + .swac-search-icon,
+.wa-live-search:focus + .swac-search-icon {
+    opacity: 1;
+}
+
+.swac-empty-state {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+    color: #888;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+/* =========================================
+   2. EXPLORE BRANDS (LOGO GRID)
+   ========================================= */
+.swac-brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+}
+
+.swac-brand-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.swac-brand-card:hover,
+.swac-brand-card:focus-within {
+    border-color: var(--wa-accent, #0E6B5C);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+}
+
+.swac-brand-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.swac-brand-logo-frame {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.swac-brand-logo-frame img {
+    max-height: 80px;
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(20%);
+    transition: filter 0.3s ease;
+}
+
+.swac-brand-card:hover img,
+.swac-brand-card:focus-within img {
+    filter: grayscale(0%);
+}
+
+.swac-brand-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.swac-brand-count {
+    font-size: 12px;
+    color: #888;
+    background: #f5f5f5;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+/* =========================================
+   3. EXPLORE CATEGORIES (CARD GRID)
+   ========================================= */
+.swac-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--swac-cat-cols, 4), 1fr);
+    gap: 24px;
+}
+
+.swac-cat-card {
+    background: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.swac-cat-card:hover,
+.swac-cat-card:focus-within {
+    border-color: var(--wa-accent, #0E6B5C);
+    box-shadow: 0 12px 28px rgba(14, 107, 92, 0.12);
+    transform: translateY(-4px);
+}
+
+.swac-cat-image-frame {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.swac-cat-image-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.swac-cat-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #222;
+}
+
+.swac-cat-count {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 14px;
+}
+
+.swac-subcats-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+    width: 100%;
+}
+
+.swac-subcat-chip {
+    font-size: 12px;
+    color: #555;
+    background: #f7f7f7;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.swac-subcat-chip:hover {
+    background: #EAF3F1;
+    color: #0E6B5C;
+}
+
+/* =========================================
+   4. INITIAL AVATAR FALLBACK
+   ========================================= */
+.swac-cat-initial,
+.swac-brand-initial {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #0E6B5C 0%, #178573 100%);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(14, 107, 92, 0.2);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+    user-select: none;
+}
+
+.swac-brand-card:hover .swac-brand-initial,
+.swac-cat-card:hover .swac-cat-initial {
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(14, 107, 92, 0.3);
+}
+
+@media (max-width: 991px) {
+    .swac-cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .swac-cat-grid,
+    .swac-brand-grid {
+        grid-template-columns: 1fr;
+    }
+}
