@@ -1,9 +1,15 @@
 <?php
 /**
- * ⚙️ CONFIGURATION REGISTRY
+ * 🏪 STORE CONFIGURATION — Stateless WhatsApp Commerce
+ * ─────────────────────────────────────────────────────
  *
- * Centralized, filterable configuration for Stateless WhatsApp Commerce.
- * Provides runtime configuration, technical paths, and module feature flags.
+ * This is one of TWO files you need to know about:
+ *
+ *   core/config.php   ← you are here  (store: phone, name, shipping, etc.)
+ *   features.php      ← plugin behaviour  (what gets turned on/off)
+ *
+ * Set your values below. Save. Done.
+ * Everything below the ⚠️ warning line is engine code — leave it alone.
  *
  * @package StatelessWaCommerce
  */
@@ -12,7 +18,131 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// 🔧 PATH & VERSION CONSTANTS (swac_ prefix compliant with WordPress.org 4+ character guideline)
+// ═══════════════════════════════════════════════════════════════════════════════
+// YOUR STORE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * WhatsApp phone number (required).
+ *
+ * E.164 format without the '+'. Country code + number. No spaces or dashes.
+ *
+ * Example: India +91 98765 43210  →  '919876543210'
+ *          US    +1  555 123 4567 →  '15551234567'
+ */
+define('SWAC_PHONE', '');
+
+/**
+ * Store display name.
+ *
+ * Used in WhatsApp order messages: "Order from <name>".
+ * Leave empty to use your WordPress site title automatically.
+ */
+define('SWAC_STORE_NAME', '');
+
+/**
+ * City / geographic focus  (optional).
+ *
+ * Shown in delivery messaging. Leave empty for no city reference.
+ * Example: 'Mumbai', 'New York'
+ */
+define('SWAC_CITY_NAME', '');
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SHIPPING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Free shipping threshold.
+ *
+ * Order value at which shipping becomes free (in your store currency).
+ * Set to 0.0 if you always charge shipping.
+ * Example: 500.0 → free shipping on orders above 500
+ */
+define('SWAC_FREE_SHIPPING_AT', 0.0);
+
+/**
+ * Flat shipping charge.
+ *
+ * Applied when the order total is below SWAC_FREE_SHIPPING_AT.
+ * Set to 0.0 if you never charge shipping.
+ */
+define('SWAC_SHIPPING_CHARGE', 0.0);
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ORDER LIMITS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Maximum distinct items in a single WhatsApp order.
+ *
+ * Prevents the WhatsApp URL from exceeding browser length limits (~2000 chars).
+ * Recommended: 10–15. Hard maximum: 50.
+ */
+define('SWAC_MAX_CART_ITEMS', 10);
+
+/**
+ * Maximum quantity per individual item.
+ *
+ * Soft retail anti-bulk limit applied per line item.
+ */
+define('SWAC_MAX_QTY_PER_ITEM', 10);
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ORDER DISCLAIMER
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Text appended to every WhatsApp order message.
+ *
+ * Reminds the customer that final price and availability are confirmed on WhatsApp.
+ * Leave empty to disable the disclaimer entirely.
+ */
+define('SWAC_ORDER_DISCLAIMER', '⚡ Final bill & product availability will be confirmed on WhatsApp.');
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOYALTY REWARD  (optional cart incentive)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Enable a loyalty reward offer in the cart drawer.
+ *
+ * When the cart value crosses SWAC_LOYALTY_THRESHOLD, the customer is shown
+ * an offer for a free or discounted reward item.
+ */
+define('SWAC_LOYALTY_ENABLED', false);
+
+/** Cart value (in store currency) that triggers the loyalty offer. */
+define('SWAC_LOYALTY_THRESHOLD', 0);
+
+/** Display label for the reward item shown to the customer. Example: 'Free Lip Balm' */
+define('SWAC_LOYALTY_ITEM_LABEL', '');
+
+/** Monetary worth of the reward item (shown for display purposes). */
+define('SWAC_LOYALTY_ITEM_WORTH', 0);
+
+/** Price charged for the reward item. Use 0 for a fully free reward. */
+define('SWAC_LOYALTY_ITEM_PRICE', 0);
+
+/** Text appended to the WhatsApp order when the loyalty offer is accepted. */
+define('SWAC_LOYALTY_FLAG', 'OFFER ACCEPTED ✅');
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ⚠️  ENGINE — DO NOT EDIT BELOW THIS LINE
+// ───────────────────────────────────────────────────────────────────────────────
+// Plugin infrastructure: path constants, configuration resolver, module checker.
+// Editing anything here without understanding the codebase will break the plugin.
+//
+// Your store settings live above.
+// Feature on/off toggles live in features.php.
+// ═══════════════════════════════════════════════════════════════════════════════
+
 if (!defined('SWAC_PATH')) {
     define('SWAC_PATH', plugin_dir_path(dirname(__FILE__)) . '/');
 }
@@ -20,13 +150,15 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)) . '/');
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.2.2');
+    define('SWAC_VERSION', '1.3.0');
 }
-
 
 if (!function_exists('swac_get_config')) {
     /**
-     * Retrieve complete plugin operational configuration.
+     * Assemble and return the resolved plugin configuration array.
+     *
+     * Reads from the constants defined above. Applies the swac_commerce_config
+     * filter for programmatic overrides (e.g. from a mu-plugin or theme).
      *
      * @return array<string, mixed>
      */
@@ -42,44 +174,39 @@ if (!function_exists('swac_get_config')) {
             ? get_woocommerce_currency_symbol()
             : '$';
 
-        $store_name = get_bloginfo('name') ?: 'Store';
+        $store_name = SWAC_STORE_NAME !== '' ? SWAC_STORE_NAME : (get_bloginfo('name') ?: 'Store');
 
         $defaults = [
-            'phone_number'              => '', // E.164 without '+', e.g. '1234567890'
+            'phone_number'              => SWAC_PHONE,
             'store_name'                => $store_name,
             'base_url'                  => '',
-            'free_shipping_at'          => 0.0,
-            'shipping_charge'           => 0.0,
+            'free_shipping_at'          => (float) SWAC_FREE_SHIPPING_AT,
+            'shipping_charge'           => (float) SWAC_SHIPPING_CHARGE,
             'currency_symbol'           => $currency_symbol,
-            'city_name'                 => '', // Optional geographical focus (e.g. 'Los Angeles')
-            'max_cart_items'            => 10,  // Max distinct items per order (URL length protection)
-            'max_qty_per_item'          => 10,  // Max units allowed per item (retail limit)
-            'order_disclaimer'          => __('⚡ Final bill & product availability will be confirmed on WhatsApp.', 'stateless-wa-commerce'),
+            'city_name'                 => SWAC_CITY_NAME,
+            'max_cart_items'            => (int) SWAC_MAX_CART_ITEMS,
+            'max_qty_per_item'          => (int) SWAC_MAX_QTY_PER_ITEM,
+            'order_disclaimer'          => SWAC_ORDER_DISCLAIMER,
+            // Prescription note: pharmacy module concern — set via swac_commerce_config filter when pharmacy module is active.
             'prescription_note_enabled' => false,
             'prescription_note'         => '',
             'loyalty'                   => [
-                'enabled'    => false,
-                'threshold'  => 0,
-                'item_label' => '',
-                'item_worth' => 0,
-                'item_price' => 0,
-                'flag'       => 'OFFER ACCEPTED ✅',
+                'enabled'    => (bool) SWAC_LOYALTY_ENABLED,
+                'threshold'  => (int)  SWAC_LOYALTY_THRESHOLD,
+                'item_label' => SWAC_LOYALTY_ITEM_LABEL,
+                'item_worth' => (int)  SWAC_LOYALTY_ITEM_WORTH,
+                'item_price' => (int)  SWAC_LOYALTY_ITEM_PRICE,
+                'flag'       => SWAC_LOYALTY_FLAG,
             ],
-            // Optional modules: 'pharmacy', 'explore', 'seo' (disabled by default)
-            // To enable a module, add its name inside the brackets below, e.g.:
-            // 'modules'                   => ['pharmacy'],
-            'modules'                   => [],
+            'modules' => [], // Controlled exclusively by features.php — do not set here.
         ];
 
-        /**
-         * Filter global commerce configuration.
-         *
-         * @param array $defaults Default configuration values.
-         */
+        /** @filter swac_commerce_config Programmatic override for store configuration. */
         $config = apply_filters('swac_commerce_config', $defaults);
 
         if (empty($config['base_url']) && !empty($config['phone_number'])) {
-            $config['base_url'] = 'https://api.whatsapp.com/send?phone=' . preg_replace('/[^0-9]/', '', (string)$config['phone_number']);
+            $config['base_url'] = 'https://api.whatsapp.com/send?phone='
+                . preg_replace('/[^0-9]/', '', (string) $config['phone_number']);
         }
 
         $resolved_config = $config;
@@ -98,7 +225,6 @@ if (!function_exists('swac_is_module_active')) {
     {
         $config = swac_get_config();
         $active_modules = apply_filters('swac_active_modules', $config['modules'] ?? []);
-
-        return in_array($module, (array)$active_modules, true);
+        return in_array($module, (array) $active_modules, true);
     }
 }

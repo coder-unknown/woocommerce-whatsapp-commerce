@@ -13,12 +13,11 @@
 > - **Sessions & Fragments Suppressed**: Native WooCommerce guest session creation (`wp_woocommerce_sessions`) and render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled.
 > - **Native Emails & Gateways Bypassed**: Standard WooCommerce customer transaction emails and gateway checkouts are not triggered because orders are initiated directly via customer WhatsApp messages.
 >
-> **Need a traditional checkout or want to disable catalog lockdown?**
-> The lockdown is completely toggleable in code. Add this filter to your theme's `functions.php`:
+> **Need to adjust or disable these behaviours?**
+> Open `features.php` (in the plugin root) — every lockdown feature group has its own on/off toggle with a full explanation. For a complete lockdown disable, set `swac_enable_catalog_lockdown` to false via filter:
 > ```php
 > add_filter('swac_enable_catalog_lockdown', '__return_false');
 > ```
-> You can also selectively customize lockdown behaviors (such as redirects or session stubbing) via the `swac_lockdown_features` filter.
 
 ---
 
@@ -104,38 +103,67 @@ Customer cart items, address details, and delivery zone serviceability run in th
 
 ---
 
-## ⚙️ Configuration & Filter Hooks
+## ⚙️ Configuration
 
-All business metrics, contact numbers, and feature toggles are customizable via WordPress filters using the `swac_` prefix:
+Two files. That's it. Open each, fill in your values, save.
 
-### 1. General Configuration (`swac_commerce_config`)
-
-```php
-add_filter('swac_commerce_config', function ($config) {
-    $config['phone_number']     = '1234567890'; // E.164 phone without '+'
-    $config['store_name']       = 'My Awesome Store';
-    $config['currency_symbol']  = '$';
-    $config['free_shipping_at'] = 50.00;
-    $config['shipping_charge']  = 5.00;
-    $config['order_disclaimer'] = '⚡ Final availability will be confirmed on WhatsApp.';
-    return $config;
-});
+```
+stateless-wa-commerce/
+  core/config.php   ← store settings  (phone, name, shipping, limits)
+  features.php      ← feature toggles (modules, lockdown groups, cleanups)
 ```
 
-### 2. Active Modules (`swac_active_modules`)
+### 1. `core/config.php` — Store Settings
 
-Enable or disable specific subsystem modules:
+Every value is a plain PHP constant. No functions, no filters, no WordPress knowledge required:
 
 ```php
-add_filter('swac_active_modules', function ($modules) {
-    // Enable core explore and seo, disable pharmacy for a general retail store
-    return ['explore', 'seo'];
-});
+// Required
+define('SWAC_PHONE',            '919876543210'); // E.164 without '+'
+define('SWAC_STORE_NAME',       'My Store');
+
+// Optional
+define('SWAC_CITY_NAME',        'Mumbai');
+define('SWAC_FREE_SHIPPING_AT', 500.0);  // Free shipping above this value
+define('SWAC_SHIPPING_CHARGE',  49.0);   // Flat charge below threshold
+define('SWAC_MAX_CART_ITEMS',   10);     // Protects WhatsApp URL length
+define('SWAC_MAX_QTY_PER_ITEM', 10);     // Per-item quantity ceiling
+
+// Loyalty reward (optional cart incentive)
+define('SWAC_LOYALTY_ENABLED',    true);
+define('SWAC_LOYALTY_THRESHOLD',  500);
+define('SWAC_LOYALTY_ITEM_LABEL', 'Free Lip Balm');
 ```
+
+### 2. `features.php` — Feature Toggles
+
+```php
+// ZONE 1: Optional WordPress cleanups (OFF by default)
+define('SWAC_DISABLE_BLOG',         false); // Redirect posts/blog to homepage
+define('SWAC_DISABLE_BLOCK_EDITOR', false); // Gutenberg off site-wide
+
+// ZONE 2: Lockdown feature groups (ON by default, individually tunable)
+define('SWAC_LOCKDOWN_HEAD_BLOAT',         true);
+define('SWAC_LOCKDOWN_SECURITY',           true);
+define('SWAC_LOCKDOWN_HEARTBEAT_COMMENTS', true); // Turn OFF to keep product reviews
+define('SWAC_LOCKDOWN_ADMIN_CLEANUP',      true);
+define('SWAC_LOCKDOWN_REGISTRATION',       true);
+define('SWAC_LOCKDOWN_SCRIPT_DEQUEUE',     true);
+
+// ZONE 3: Modules (OFF by default)
+define('SWAC_MODULE_PHARMACY', false);
+define('SWAC_MODULE_EXPLORE',  false);
+define('SWAC_MODULE_SEO',      false);
+```
+
+> [!NOTE]
+> Cart & checkout redirect, WC AJAX intercept, and the zero-session engine are **not** listed in `features.php` — they are architectural non-negotiables. Disabling them would break the WhatsApp checkout model entirely.
+
+---
 
 ### 3. Delivery Zones (`swac_delivery_zones`)
 
-Enforce postal code serviceability (Open Mode by default):
+Delivery zone serviceability cannot be defined via constants (it's runtime, potentially database-driven). Configure via filter:
 
 ```php
 add_filter('swac_delivery_zones', function ($config) {
@@ -146,29 +174,26 @@ add_filter('swac_delivery_zones', function ($config) {
         'status_class' => 'swac-pin-success',
         'allow_order'  => true,
         'pincodes'     => [
-            '90210' => 'Beverly Hills',
-            '90001' => 'Los Angeles',
+            '400001' => 'Mumbai Fort',
+            '400051' => 'Bandra',
         ],
     ];
     return $config;
 });
 ```
 
-### 4. Lockdown Customization (`swac_enable_catalog_lockdown` & `swac_lockdown_features`)
+### 4. Advanced: Programmatic Config Overrides
+
+For dynamic config (multi-site, environment-specific, or database-driven values), the `swac_commerce_config` filter overrides any constant:
 
 ```php
-// Option A: Completely turn off lockdown (preserves normal WooCommerce checkout)
-add_filter('swac_enable_catalog_lockdown', '__return_false');
-
-// Option B: Selectively enable/disable lockdown sub-features
-add_filter('swac_lockdown_features', function ($features) {
-    $features['cart_checkout_redirect'] = false; // Keep cart and checkout routes accessible
-    $features['session_tuning']         = true;  // Keep zero-session handler active
-    $features['wc_ajax_intercept']      = true;  // Intercept cart fragments AJAX
-    $features['script_dequeue']         = true;  // Dequeue unused core cart scripts
-    return $features;
+add_filter('swac_commerce_config', function ($config) {
+    $config['phone_number']     = get_option('my_store_phone');
+    $config['free_shipping_at'] = (float) get_option('my_shipping_threshold');
+    return $config;
 });
 ```
+
 
 ---
 

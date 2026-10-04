@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] — 2026-10-05
+
+### Added
+- **Developer Feature Flag Control Panel** (`features.php`):
+  - New root-level `features.php` — one of two files a developer interacts with. Documents and controls everything the plugin does beyond its core WhatsApp checkout purpose.
+  - **Zone 1 — Optional WordPress cleanups** (OFF by default, non-destructive):
+    - `SWAC_DISABLE_BLOG`: 301-redirects posts, blog index, author, date, and tag archives to the homepage. Data is never deleted.
+    - `SWAC_DISABLE_BLOCK_EDITOR`: Extends the existing product-only Gutenberg disable to cover all post types site-wide.
+  - **Zone 2 — Lockdown feature group toggles** (ON by default): Surfaces the six user-tunable lockdown groups as readable constants — `SWAC_LOCKDOWN_HEAD_BLOAT`, `SWAC_LOCKDOWN_SECURITY`, `SWAC_LOCKDOWN_HEARTBEAT_COMMENTS`, `SWAC_LOCKDOWN_ADMIN_CLEANUP`, `SWAC_LOCKDOWN_REGISTRATION`, `SWAC_LOCKDOWN_SCRIPT_DEQUEUE`. Architectural locks (cart redirect, AJAX intercept, zero-session engine) are documented as intentionally absent.
+  - **Zone 3 — Module activation** (OFF by default): `SWAC_MODULE_PHARMACY`, `SWAC_MODULE_EXPLORE`, `SWAC_MODULE_SEO` replace the old `'modules' => []` array in `core/config.php`.
+
+### Changed
+- **`core/config.php` restructured as a human-editable constant file**:
+  - All store settings are now top-level PHP constants — `SWAC_PHONE`, `SWAC_STORE_NAME`, `SWAC_CITY_NAME`, `SWAC_FREE_SHIPPING_AT`, `SWAC_SHIPPING_CHARGE`, `SWAC_MAX_CART_ITEMS`, `SWAC_MAX_QTY_PER_ITEM`, `SWAC_ORDER_DISCLAIMER`, and all `SWAC_LOYALTY_*` constants. No PHP functions or WordPress filter knowledge required.
+  - Plugin engine code (`SWAC_PATH`, `SWAC_URL`, `SWAC_VERSION`, `swac_get_config()`, `swac_is_module_active()`) separated below a clear `⚠️ ENGINE — DO NOT EDIT BELOW THIS LINE` boundary.
+  - `swac_get_config()` now reads from constants, remaining fully compatible with the `swac_commerce_config` filter for programmatic overrides.
+- **Prescription note removed from core store config**: `SWAC_PRESCRIPTION_NOTE_ENABLED` and `SWAC_PRESCRIPTION_NOTE` removed from `core/config.php`. These are pharmacy module concerns — a clothing or electronics store should never encounter them. The pharmacy module sets these keys via the `swac_commerce_config` filter when active. Engine defaults remain `false` / `''` for backward compatibility.
+- **Frontend enqueue extracted** (`frontend/enqueue.php`): Moved `wp_enqueue_scripts` hook — including stylesheet registration, `wa_cart.js` enqueue, delivery zone pin processing, and `swacCommerce`/`swacZones` localization — out of the root plugin file into a dedicated frontend file.
+- **Admin notices extracted** (`backend/admin-tools.php`): WooCommerce dependency check and unconfigured phone number warning moved from the root plugin file to `backend/admin-tools.php`.
+- **README updated**: Configuration section rewritten to lead with `core/config.php` and `features.php` as the primary developer interface. Filter-based overrides demoted to an "Advanced" subsection. Warning block updated to reference `features.php` for lockdown tuning.
+
+---
+
 ## [1.2.2] — 2026-10-03
 
 ### Added

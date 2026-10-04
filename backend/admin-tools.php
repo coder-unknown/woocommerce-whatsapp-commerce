@@ -156,3 +156,39 @@ if (!function_exists('swac_render_missing_images_finder')) {
 }
 
 add_shortcode('swac_missing_images_finder', 'swac_render_missing_images_finder');
+
+/**
+ * 🛍️ ADMIN NOTICES: WOOCOMMERCE DEPENDENCY & CONFIGURATION WARNINGS
+ *
+ * - Shows an error if WooCommerce is not installed/active.
+ * - Shows a warning if no WhatsApp phone number has been configured.
+ */
+add_action('admin_notices', function () {
+    if (!class_exists('WooCommerce')) {
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p>
+                <strong><?php esc_html_e('Stateless WhatsApp Commerce', 'stateless-wa-commerce'); ?></strong>
+                <?php esc_html_e('requires WooCommerce to be installed and active.', 'stateless-wa-commerce'); ?>
+            </p>
+        </div>
+        <?php
+        return;
+    }
+
+    if (!current_user_can('manage_woocommerce')) {
+        return;
+    }
+
+    $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
+    if (empty($cfg['phone_number']) && empty($cfg['base_url'])) {
+        ?>
+        <div class="notice notice-warning is-dismissible">
+            <p>
+                <strong><?php esc_html_e('Stateless WhatsApp Commerce:', 'stateless-wa-commerce'); ?></strong>
+                <?php esc_html_e('No WhatsApp phone number is configured. Customer ordering links and buttons are currently disabled to prevent broken links. Please set phone_number via the swac_commerce_config filter.', 'stateless-wa-commerce'); ?>
+            </p>
+        </div>
+        <?php
+    }
+});
