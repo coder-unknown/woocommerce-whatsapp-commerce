@@ -98,14 +98,19 @@ add_action('save_post_product', function ($post_id) {
         return;
     }
 
-    foreach ($raw_input as $taxonomy => $term_id) {
-        $swac_nonce = 'swac_taxonomy_nonce_' . sanitize_key($taxonomy);
+    $allowed_taxonomies = (array) apply_filters('swac_select2_taxonomies', ['product_cat', 'product_brand']);
 
+    foreach ($allowed_taxonomies as $taxonomy) {
+        if (!taxonomy_exists($taxonomy) || !isset($raw_input[$taxonomy])) {
+            continue;
+        }
+
+        $swac_nonce = 'swac_taxonomy_nonce_' . sanitize_key($taxonomy);
         if (!isset($_POST[$swac_nonce]) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST[$swac_nonce])), 'swac_save_taxonomy_select2')) {
             continue;
         }
 
-        $term_id = (int)$term_id;
+        $term_id = (int) $raw_input[$taxonomy];
         if ($term_id > 0) {
             wp_set_object_terms($post_id, [$term_id], $taxonomy, false);
         } else {
@@ -171,8 +176,9 @@ add_action('admin_enqueue_scripts', function ($hook) {
         return;
     }
 
-    wp_enqueue_style('select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], '4.1.0');
-    wp_enqueue_script('select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', ['jquery'], '4.1.0', true);
+    // Use WooCommerce core registered Select2 assets
+    wp_enqueue_style('select2');
+    wp_enqueue_script('select2');
 
     wp_enqueue_script(
         'swac-admin-taxonomy',

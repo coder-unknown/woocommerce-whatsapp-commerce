@@ -186,7 +186,7 @@ add_action('admin_notices', function () {
         <div class="notice notice-warning is-dismissible">
             <p>
                 <strong><?php esc_html_e('Stateless WhatsApp Commerce:', 'stateless-wa-commerce'); ?></strong>
-                <?php esc_html_e('No WhatsApp phone number is configured. Customer ordering links and buttons are currently disabled to prevent broken links. Please set phone_number via the swac_commerce_config filter.', 'stateless-wa-commerce'); ?>
+                <?php esc_html_e('No WhatsApp phone number is configured. Customer ordering links and buttons are currently disabled to prevent broken links. Please set SWAC_PHONE in core/config.php or via the swac_commerce_config filter.', 'stateless-wa-commerce'); ?>
             </p>
         </div>
         <?php

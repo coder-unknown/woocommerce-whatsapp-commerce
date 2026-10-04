@@ -38,11 +38,11 @@ if (!function_exists('swac_render_delivery_notice')) {
         $disclaimer = (string)apply_filters('swac_delivery_batch_disclaimer', '');
 
         $disclaimer_html = !empty($disclaimer)
-            ? sprintf('<div class="swac-batch-price-line wa-batch-price-line">%s</div>', esc_html($disclaimer))
+            ? sprintf('<div class="swac-batch-price-line">%s</div>', esc_html($disclaimer))
             : '';
 
         return sprintf(
-            '%s<div class="swac-delivery-notice wa-delivery-notice"><span class="swac-delivery-icon wa-delivery-icon" aria-hidden="true">⚡</span> <span class="swac-delivery-text wa-delivery-text">%s</span></div>',
+            '%s<div class="swac-delivery-notice"><span class="swac-delivery-icon" aria-hidden="true">⚡</span> <span class="swac-delivery-text">%s</span></div>',
             $disclaimer_html,
             esc_html($message)
         );

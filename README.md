@@ -9,7 +9,7 @@
 > **Important: Store Behavior Notice Upon Activation**
 >
 > Activating Stateless WhatsApp Commerce transforms your WooCommerce store from a traditional payment gateway store into a **direct WhatsApp order-intent catalog**:
-> - **Page Redirections**: Cart, Checkout, and My Account pages are intercepted and redirected (default: redirects to shop/home).
+> - **Page Redirections**: Cart, Checkout, and My Account pages are intercepted and redirected (default: redirects to homepage).
 > - **Sessions & Fragments Suppressed**: Native WooCommerce guest session creation (`wp_woocommerce_sessions`) and render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled.
 > - **Native Emails & Gateways Bypassed**: Standard WooCommerce customer transaction emails and gateway checkouts are not triggered because orders are initiated directly via customer WhatsApp messages.
 >
@@ -128,6 +128,7 @@ define('SWAC_FREE_SHIPPING_AT', 500.0);  // Free shipping above this value
 define('SWAC_SHIPPING_CHARGE',  49.0);   // Flat charge below threshold
 define('SWAC_MAX_CART_ITEMS',   10);     // Protects WhatsApp URL length
 define('SWAC_MAX_QTY_PER_ITEM', 10);     // Per-item quantity ceiling
+define('SWAC_ORDER_DISCLAIMER', '⚡ Final bill & product availability will be confirmed on WhatsApp.');
 
 // Loyalty reward (optional cart incentive)
 define('SWAC_LOYALTY_ENABLED',    true);

@@ -184,9 +184,14 @@ if (!function_exists('swac_get_current_product')) {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SHARED UTILITIES: SEO JSON-LD & MONOGRAM BADGES
+// ─────────────────────────────────────────────────────────────────────────────
+
 if (!function_exists('swac_seo_print_jsonld')) {
     /**
      * Outputs a structured JSON-LD <script> block directly into document head.
+     * Consumed by native SEO module and template headers.
      *
      * @param array $schema Schema definition array.
      * @return void
@@ -215,7 +220,7 @@ if (!function_exists('swac_get_term_initial')) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PERFORMANCE RESOURCE HINTS & SCRIPT DEFERRAL
+// PERFORMANCE RESOURCE HINTS
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -226,24 +231,3 @@ add_action('wp_head', function () {
     echo '<link rel="dns-prefetch" href="https://wa.me">' . "\n";
 }, 1);
 
-/**
- * Defer non-critical scripts on frontend requests.
- */
-add_filter('script_loader_tag', function ($tag, $handle, $src) {
-    if (is_admin()) {
-        return $tag;
-    }
-
-    $defer_handles = [
-        'swac-frontend-script',
-        'swac-cart-script',
-    ];
-
-    if (in_array($handle, $defer_handles, true)) {
-        if (!preg_match('/\b(defer|async)\b/i', $tag)) {
-            $tag = str_replace(' src=', ' defer src=', $tag);
-        }
-    }
-
-    return $tag;
-}, 10, 3);

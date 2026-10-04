@@ -17,18 +17,6 @@ add_action('init', function () {
     add_rewrite_rule('^sitemap\.xml$', 'index.php?swac_sitemap=1', 'top');
 });
 
-$swac_plugin_file = defined('SWAC_PATH') ? SWAC_PATH . 'stateless-wa-commerce.php' : null;
-if ($swac_plugin_file && file_exists($swac_plugin_file)) {
-    register_activation_hook($swac_plugin_file, function () {
-        add_rewrite_rule('^sitemap\.xml$', 'index.php?swac_sitemap=1', 'top');
-        flush_rewrite_rules();
-    });
-
-    register_deactivation_hook($swac_plugin_file, function () {
-        flush_rewrite_rules();
-    });
-}
-
 add_filter('query_vars', function ($vars) {
     $vars[] = 'swac_sitemap';
     return $vars;

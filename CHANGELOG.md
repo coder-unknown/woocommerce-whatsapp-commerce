@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] — 2026-10-05
+
+### Fixed
+- **Sitemap Activation Hook**: Moved `register_activation_hook()` and `register_deactivation_hook()` from `integrations/sitemap-generator.php` to `stateless-wa-commerce.php` to ensure `/sitemap.xml` rewrite rules flush properly on activation.
+- **WooCommerce Native Select2**: Replaced external CDN release-candidate assets (`select2@4.1.0-rc.0`) with WooCommerce core registered `select2` script and style handles in `backend/taxonomy-ui.php`.
+- **Taxonomy Save Validation**: Enforced whitelist check against `swac_select2_taxonomies` and `taxonomy_exists()` in `backend/taxonomy-ui.php` prior to updating object terms.
+- **Dead Script Defer Filter**: Removed redundant `script_loader_tag` filter in `core/pricing-engine.php` (frontend script deferral is handled natively via WP 6.3+ script loading strategy in `frontend/enqueue.php`).
+- **Lockdown Boundary Alignment**:
+  - Removed `is_author()` from `cart_checkout_redirect` in `core/catalog-lockdown.php` (already properly handled under `SWAC_DISABLE_BLOG` in `features.php`).
+  - Moved `show_admin_bar(false)` from `cart_checkout_redirect` into `SWAC_LOCKDOWN_ADMIN_CLEANUP`.
+- **Defensive Function Guards**: Added `if (!function_exists(...))` guards to `swac_price_block_shortcode()`, `swac_pack_size_shortcode()`, `swac_price_pack_hierarchy_shortcode()`, and `swac_action_row_shortcode()` in `frontend/single/product-meta.php`, as well as `swac_register_null_session_handler()` in `core/catalog-lockdown.php`.
+- **Markup Consistency**: Removed redundant `wa-*` legacy CSS classes from `frontend/single/delivery-notice.php` in favor of canonical `swac-*` classes.
+- **Cart Drawer Disclaimer Fallback**: Removed hardcoded disclaimer fallback in `frontend/components/cart-drawer.php` that was overriding empty or custom disclaimer configurations.
+- **Admin Configuration Notice**: Clarified the phone warning notice in `backend/admin-tools.php` to mention `SWAC_PHONE in core/config.php`.
+- **WooCommerce Admin Route Intercept**: Added `admin_init` redirect for `admin.php?page=wc-admin` (e.g. `task=products` onboarding and empty-state product links) to redirect seamlessly to the standard WordPress product editor (`post-new.php?post_type=product`) instead of triggering a 403 "Sorry, you are not allowed to access this page" when `admin_cleanup` strips `wc-admin`.
+
+---
+
 ## [1.3.0] — 2026-10-05
 
 ### Added

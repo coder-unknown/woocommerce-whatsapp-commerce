@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 
 add_action('wp_footer', function () {
     $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
-    $disclaimer = $cfg['order_disclaimer'] ?? __('⚡ Final bill & product availability will be confirmed on WhatsApp.', 'stateless-wa-commerce');
+    $disclaimer = $cfg['order_disclaimer'] ?? '';
     $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
     ?>
     <!-- WhatsApp Cart Bubble -->

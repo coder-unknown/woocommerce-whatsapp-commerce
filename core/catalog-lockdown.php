@@ -143,7 +143,6 @@ if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
         }
 
         $is_locked_page = (
-            is_author() ||
             (function_exists('is_cart') && is_cart()) ||
             (function_exists('is_checkout') && is_checkout()) ||
             (function_exists('is_account_page') && is_account_page())
@@ -185,12 +184,6 @@ if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
             add_action('template_redirect', function () {
                 wc_clear_notices();
             }, 2);
-        }
-    });
-
-    add_action('after_setup_theme', function () {
-        if (!is_user_logged_in()) {
-            show_admin_bar(false);
         }
     });
 }
@@ -261,55 +254,97 @@ if (swac_is_lockdown_enabled('wc_ajax_intercept')) {
 // SECTION 6: ADMIN DASHBOARD & MENU CLEANUP
 // ─────────────────────────────────────────────────────────────────────────────
 
-if (swac_is_lockdown_enabled('admin_cleanup') && is_admin()) {
-    add_filter('use_block_editor_for_post_type', function ($use_block_editor, $post_type) {
-        if ($post_type === 'product') {
-            return false;
+if (swac_is_lockdown_enabled('admin_cleanup')) {
+    add_action('after_setup_theme', function () {
+        if (!is_user_logged_in()) {
+            show_admin_bar(false);
         }
-        return $use_block_editor;
-    }, 100, 2);
-    add_filter('use_widgets_block_editor', '__return_false');
-
-    add_action('admin_menu', function () {
-        remove_menu_page('edit-comments.php');
-        remove_menu_page('woocommerce-marketing');
-        remove_menu_page('wc-admin');
-        remove_submenu_page('woocommerce', 'wc-admin');
-        remove_submenu_page('woocommerce', 'wc-admin&path=/analytics/overview');
-        remove_submenu_page('woocommerce', 'wc-addons');
-        remove_submenu_page('woocommerce', 'wc-status');
-    }, 9999);
-
-    add_filter('woocommerce_admin_features', function ($features) {
-        $bloat_features = [
-            'marketing',
-            'analytics',
-            'analytics-dashboard',
-            'analytics-settings',
-            'coupons',
-            'marketplace',
-            'onboarding',
-            'homescreen',
-            'activity-panels',
-            'remote-inbox-notifications',
-        ];
-        return array_values(array_diff($features, $bloat_features));
     });
 
-    add_filter('woocommerce_allow_marketplace_suggestions', '__return_false');
-    add_filter('woocommerce_helper_suppress_connect_notice', '__return_true');
-    add_filter('woocommerce_helper_suppress_admin_notices', '__return_true');
-    add_filter('woocommerce_show_admin_notice_about_connection', '__return_false');
+    if (is_admin()) {
+        add_filter('use_block_editor_for_post_type', function ($use_block_editor, $post_type) {
+            if ($post_type === 'product') {
+                return false;
+            }
+            return $use_block_editor;
+        }, 100, 2);
+        add_filter('use_widgets_block_editor', '__return_false');
 
-    add_action('wp_dashboard_setup', function () {
-        remove_meta_box('dashboard_primary', 'dashboard', 'side');
-        remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
-        remove_meta_box('dashboard_activity', 'dashboard', 'normal');
-        remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
-        remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
-    });
+        add_action('admin_menu', function () {
+            remove_menu_page('edit-comments.php');
+            remove_menu_page('woocommerce-marketing');
+            remove_menu_page('wc-admin');
+            remove_submenu_page('woocommerce', 'wc-admin');
+            remove_submenu_page('woocommerce', 'wc-admin&path=/analytics/overview');
+            remove_submenu_page('woocommerce', 'wc-addons');
+            remove_submenu_page('woocommerce', 'wc-status');
+        }, 9999);
 
-    add_filter('rank_math/admin/promo_notices', '__return_empty_array');
+        /**
+         * Redirect removed WooCommerce admin pages to their classic equivalents.
+         * Prevents 403 "Sorry, you are not allowed to access this page" when clicking
+         * WooCommerce onboarding tasks, empty-state CTAs, or the WooCommerce Home route.
+         */
+        add_action('admin_init', function () {
+            global $pagenow;
+            if ($pagenow !== 'admin.php' || !isset($_GET['page'])) {
+                return;
+            }
+
+            $page = sanitize_key($_GET['page']);
+
+            if ($page === 'wc-admin') {
+                $task = isset($_GET['task']) ? sanitize_text_field(wp_unslash($_GET['task'])) : '';
+                $path = isset($_GET['path']) ? sanitize_text_field(wp_unslash($_GET['path'])) : '';
+
+                // Product onboarding task or React new product URL -> standard product editor
+                if ($task === 'products' || strpos($path, 'add-product') !== false) {
+                    wp_safe_redirect(admin_url('post-new.php?post_type=product'));
+                    exit;
+                }
+
+                // General wc-admin (homescreen / setup) -> products catalog list
+                wp_safe_redirect(admin_url('edit.php?post_type=product'));
+                exit;
+            }
+
+            if (in_array($page, ['wc-addons', 'woocommerce-marketing'], true)) {
+                wp_safe_redirect(admin_url('edit.php?post_type=product'));
+                exit;
+            }
+        });
+
+        add_filter('woocommerce_admin_features', function ($features) {
+            $bloat_features = [
+                'marketing',
+                'analytics',
+                'analytics-dashboard',
+                'analytics-settings',
+                'coupons',
+                'marketplace',
+                'onboarding',
+                'homescreen',
+                'activity-panels',
+                'remote-inbox-notifications',
+            ];
+            return array_values(array_diff($features, $bloat_features));
+        });
+
+        add_filter('woocommerce_allow_marketplace_suggestions', '__return_false');
+        add_filter('woocommerce_helper_suppress_connect_notice', '__return_true');
+        add_filter('woocommerce_helper_suppress_admin_notices', '__return_true');
+        add_filter('woocommerce_show_admin_notice_about_connection', '__return_false');
+
+        add_action('wp_dashboard_setup', function () {
+            remove_meta_box('dashboard_primary', 'dashboard', 'side');
+            remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
+            remove_meta_box('dashboard_activity', 'dashboard', 'normal');
+            remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
+            remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
+        });
+
+        add_filter('rank_math/admin/promo_notices', '__return_empty_array');
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -424,52 +459,54 @@ if (swac_is_lockdown_enabled('session_tuning')) {
     add_action('woocommerce_loaded', 'swac_register_null_session_handler', 5);
     add_action('plugins_loaded', 'swac_register_null_session_handler', 20);
 
-    function swac_register_null_session_handler(): void
-    {
-        if (class_exists('WC_Session') && !class_exists('SWAC_Null_Session_Handler')) {
-            class SWAC_Null_Session_Handler extends WC_Session
-            {
-                public function init()
+    if (!function_exists('swac_register_null_session_handler')) {
+        function swac_register_null_session_handler(): void
+        {
+            if (class_exists('WC_Session') && !class_exists('SWAC_Null_Session_Handler')) {
+                class SWAC_Null_Session_Handler extends WC_Session
                 {
-                }
+                    public function init()
+                    {
+                    }
 
-                public function cleanup_sessions()
-                {
-                }
+                    public function cleanup_sessions()
+                    {
+                    }
 
-                public function get_session_data()
-                {
-                    return [];
-                }
+                    public function get_session_data()
+                    {
+                        return [];
+                    }
 
-                public function save_data()
-                {
-                }
+                    public function save_data()
+                    {
+                    }
 
-                public function destroy_session()
-                {
-                }
+                    public function destroy_session()
+                    {
+                    }
 
-                public function set_customer_session_cookie($set)
-                {
-                }
+                    public function set_customer_session_cookie($set)
+                    {
+                    }
 
-                public function get_session_cookie()
-                {
-                    return false;
-                }
+                    public function get_session_cookie()
+                    {
+                        return false;
+                    }
 
-                public function has_session(): bool
-                {
-                    return false;
-                }
+                    public function has_session(): bool
+                    {
+                        return false;
+                    }
 
-                public function maybe_set_customer_session_cookie(): void
-                {
-                }
+                    public function maybe_set_customer_session_cookie(): void
+                    {
+                    }
 
-                public function forget_session(): void
-                {
+                    public function forget_session(): void
+                    {
+                    }
                 }
             }
         }

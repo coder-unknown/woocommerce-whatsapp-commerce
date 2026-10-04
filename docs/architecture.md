@@ -29,17 +29,17 @@ The plugin registers `SWAC_Null_Session_Handler extends WC_Session`, replacing W
 The WooCommerce AJAX actions for cart fragments (`woocommerce_get_refreshed_fragments`), cart additions, and checkout review updates are removed. Requests matching blocked endpoints (`wc-ajax=get_refreshed_fragments`, `apply_coupon`, `update_order_review`) are intercepted early during `init` and halted with an HTTP 403 JSON response (`{"status":"disabled"}`).
 
 ### 2.3. Guest Route Redirection (302 Gate)
-Frontend requests to WooCommerce cart (`/cart/`), checkout (`/checkout/`), and my-account (`/my-account/`) pages are intercepted via `template_redirect` and safely redirected (HTTP 302) to the catalog shop (`/shop/`) or homepage.
+Frontend requests to WooCommerce cart (`/cart/`), checkout (`/checkout/`), and my-account (`/my-account/`) pages are intercepted via `template_redirect` and safely redirected (HTTP 302) to the homepage (`home_url('/')`). Additionally, requests to `admin.php?page=wc-admin` (such as onboarding product creation tasks) automatically redirect to the classic product editor.
 
 ### 2.4. Toggleable Lockdown Engine
-The entire catalog lockdown is toggleable:
+The six non-architectural lockdown feature groups are individually tunable via constants in `features.php` (`SWAC_LOCKDOWN_HEAD_BLOAT`, `SWAC_LOCKDOWN_SECURITY`, `SWAC_LOCKDOWN_HEARTBEAT_COMMENTS`, `SWAC_LOCKDOWN_ADMIN_CLEANUP`, `SWAC_LOCKDOWN_REGISTRATION`, `SWAC_LOCKDOWN_SCRIPT_DEQUEUE`), or programmatically via filters:
 ```php
 // Turn off lockdown completely:
 add_filter('swac_enable_catalog_lockdown', '__return_false');
 
-// Or customize individual features:
+// Or customize individual features programmatically:
 add_filter('swac_lockdown_features', function ($features) {
-    $features['cart_checkout_redirect'] = false; // allow normal cart/checkout pages
+    $features['admin_cleanup'] = false; // preserve full WooCommerce marketing & analytics admin
     return $features;
 });
 ```
