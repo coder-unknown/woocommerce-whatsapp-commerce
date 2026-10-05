@@ -10,7 +10,7 @@
 >
 > Activating Stateless WhatsApp Commerce transforms your WooCommerce store from a traditional payment gateway store into a **direct WhatsApp order-intent catalog**:
 > - **Page Redirections**: Cart, Checkout, and My Account pages are intercepted and redirected (default: redirects to homepage).
-> - **Sessions & Fragments Suppressed**: Native WooCommerce guest session creation (`wp_woocommerce_sessions`) and render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled.
+> - **Sessions & Fragments Suppressed**: Native WooCommerce frontend session creation (`wp_woocommerce_sessions`) and render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled site-wide for all visitors.
 > - **Native Emails & Gateways Bypassed**: Standard WooCommerce customer transaction emails and gateway checkouts are not triggered because orders are initiated directly via customer WhatsApp messages.
 >
 > **Need to adjust or disable these behaviours?**
@@ -34,13 +34,13 @@ Customer cart items, address details, and delivery zone serviceability run in th
 | Metric / Behavior | Standard WooCommerce | Stateless WhatsApp Commerce |
 | :--- | :--- | :--- |
 | **Full-Page Cache Hits** | Frequently bypassed by session cookies & cart fragments | **Served from full-page cache without PHP or database overhead** |
-| **Database Session Writes** | 1 write per guest browsing session (`wp_woocommerce_sessions`) | **0 Database Writes** (handled entirely client-side) |
-| **Guest Cookies** | Plugin sets `wp_woocommerce_session_*`, `woocommerce_items_in_cart` | **Plugin sets zero guest cookies** (static cache friendly) |
+| **Database Session Writes** | 1 write per browsing session (`wp_woocommerce_sessions`) | **0 Database Writes** (handled entirely client-side) |
+| **Frontend Cookies** | Plugin sets `wp_woocommerce_session_*`, `woocommerce_items_in_cart` | **Plugin sets zero frontend commerce cookies** (static cache friendly) |
 | **Cart Fragments AJAX** | Dispatches `get_refreshed_fragments` on page loads | **Completely disabled** (no background server requests) |
 | **Checkout Workflow** | Multi-step form with cart abandonment | **Direct WhatsApp Order** with itemized pricing & address |
 | **Edge Cacheability (Cloudflare / CDN)** | Requires complex cookie-bypass exclusion rules | **Edge-cache friendly** (depends on your edge cache rules) |
 
-> *Note on cookies & cache: The plugin itself sets zero guest cookies. Overall site cookie behavior and Cloudflare edge caching also depend on your active theme, third-party plugins, and CDN page rule configurations.*
+> *Note on cookies & cache: The plugin itself sets zero frontend commerce cookies. Overall site cookie behavior and Cloudflare edge caching also depend on your active theme, third-party plugins, and CDN page rule configurations.*
 
 ---
 
@@ -100,6 +100,22 @@ Customer cart items, address details, and delivery zone serviceability run in th
   - `integrations/`: Streaming low-memory XML sitemap generator (`/sitemap.xml`) and reverse-proxy SSL enforcer.
 - **HPOS & Modern Block Ready**:
   Compatibility for High-Performance Order Storage (`custom_order_tables`) and Cart/Checkout Blocks declared via `FeaturesUtil::declare_compatibility()` on `before_woocommerce_init`.
+
+---
+
+## 🎨 Theme & Builder Compatibility
+
+Stateless WhatsApp Commerce is built as a **true drop-in solution** designed to work out of the box with almost any WordPress theme or visual page builder:
+
+- **100% Theme Agnostic**: Leaves all site layout, typography, branding, headers, footers, and product grid designs completely untouched. The plugin does not override your theme's archive or single-product templates.
+- **Tested with Visual Page Builders**: Works seamlessly with **Breakdance Builder**, **Elementor**, **Bricks**, **Divi**, and modern **WordPress Block Themes** (Full Site Editing).
+- **Automatic "Add to Cart" Transformation**:
+  - **Catalog & Archive Loops**: Automatically hooks into `woocommerce_loop_add_to_cart_link` to transform standard server-side buttons into client-side WhatsApp order actions.
+  - **Single Product Pages**: Automatically intercepts the native WooCommerce `form.cart` submission (`.single_add_to_cart_button`) directly in the browser via JavaScript (`preventDefault`). Clicking "Add to Cart" immediately adds the product to `localStorage` without triggering page reloads, AJAX delays, or session cookies.
+  - **Custom Builder Templates**: When designing custom single-product layouts in Breakdance or Elementor, you can either keep the builder's standard Add to Cart widget (which is automatically intercepted) or drop in the dedicated `[swac_action_row]` shortcode for integrated quantity steppers and WhatsApp ordering.
+- **Zero-Dependency Slide-Out Drawer**:
+  - Replaces traditional multi-step `/cart/` and `/checkout/` redirection loops with a modern, lightweight, client-side slide-out cart drawer.
+  - Features real-time totals, dynamic shipping threshold progress, item quantity selectors, and postal zone serviceability checks, compiling everything directly into the final `wa.me` order link.
 
 ---
 
@@ -228,6 +244,7 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 - **WooCommerce**: 8.0 through 11.1 (Tested up to 11.1)
 - **HPOS**: Fully compatible (Custom Order Tables declared)
 - **Cart/Checkout Blocks**: Declared compatible
+- **Themes & Page Builders**: 100% theme-agnostic; tested with Breakdance Builder, Elementor, Bricks, and classic/block themes
 - **Web Server / Cache**: LiteSpeed Web Server, Nginx, or any reverse-proxy / full-page caching layer
 
 ---

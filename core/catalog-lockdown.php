@@ -138,7 +138,11 @@ if (swac_is_lockdown_enabled('heartbeat_comments')) {
 
 if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
     add_action('template_redirect', function () {
-        if (is_user_logged_in()) {
+        // Exempt wp-admin, Customizer preview, and visual page builder editors
+        if (is_admin() || (function_exists('is_customize_preview') && is_customize_preview())) {
+            return;
+        }
+        if (isset($_GET['elementor-preview']) || isset($_GET['breakdance'])) {
             return;
         }
 
@@ -167,17 +171,17 @@ if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
     });
 
     add_filter('woocommerce_get_cart_url', function ($url) {
-        return is_user_logged_in() ? $url : home_url('/');
+        return is_admin() ? $url : home_url('/');
     });
     add_filter('woocommerce_get_checkout_url', function ($url) {
-        return is_user_logged_in() ? $url : home_url('/');
+        return is_admin() ? $url : home_url('/');
     });
     add_filter('woocommerce_get_myaccount_page_permalink', function ($url) {
-        return is_user_logged_in() ? $url : home_url('/');
+        return is_admin() ? $url : home_url('/');
     });
 
     add_action('woocommerce_init', function () {
-        if (is_user_logged_in() || is_admin()) {
+        if (is_admin()) {
             return;
         }
         if (function_exists('wc_clear_notices')) {
@@ -194,7 +198,7 @@ if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
 
 if (swac_is_lockdown_enabled('wc_ajax_intercept')) {
     add_action('wp_loaded', function () {
-        if (is_user_logged_in() || is_admin()) {
+        if (is_admin()) {
             return;
         }
 
@@ -210,7 +214,7 @@ if (swac_is_lockdown_enabled('wc_ajax_intercept')) {
     }, 1);
 
     add_action('wp_loaded', function () {
-        if (is_user_logged_in() || is_admin()) {
+        if (is_admin()) {
             return;
         }
 
@@ -284,10 +288,13 @@ if (swac_is_lockdown_enabled('admin_cleanup')) {
          * Redirect removed WooCommerce admin pages to their classic equivalents.
          * Prevents 403 "Sorry, you are not allowed to access this page" when clicking
          * WooCommerce onboarding tasks, empty-state CTAs, or the WooCommerce Home route.
+         *
+         * Hooked to 'admin_page_access_denied' because WordPress validates menu capabilities
+         * inside menu.php and triggers wp_die() before 'admin_init' is ever reached.
+         * Also hooked to 'admin_init' as a fallback if the page is accessible.
          */
-        add_action('admin_init', function () {
-            global $pagenow;
-            if ($pagenow !== 'admin.php' || !isset($_GET['page'])) {
+        $redirect_wc_admin = function () {
+            if (!isset($_GET['page'])) {
                 return;
             }
 
@@ -312,7 +319,10 @@ if (swac_is_lockdown_enabled('admin_cleanup')) {
                 wp_safe_redirect(admin_url('edit.php?post_type=product'));
                 exit;
             }
-        });
+        };
+
+        add_action('admin_page_access_denied', $redirect_wc_admin);
+        add_action('admin_init', $redirect_wc_admin);
 
         add_filter('woocommerce_admin_features', function ($features) {
             $bloat_features = [
@@ -406,35 +416,35 @@ if (swac_is_lockdown_enabled('script_dequeue')) {
         wp_deregister_script('wp-embed');
 
         if (!is_user_logged_in()) {
-            wp_dequeue_script('wc-order-attribution');
-            wp_deregister_script('wc-order-attribution');
-            wp_dequeue_script('sourcebuster-js');
-            wp_deregister_script('sourcebuster-js');
-
             wp_dequeue_style('dashicons');
             wp_deregister_style('dashicons');
-
-            wp_dequeue_script('wc-cart-fragments');
-            wp_deregister_script('wc-cart-fragments');
-
-            wp_dequeue_script('selectWoo');
-            wp_dequeue_style('select2');
-
-            wp_dequeue_script('wc-password-strength-meter');
-            wp_deregister_script('wc-password-strength-meter');
-
-            wp_dequeue_script('zxcvbn-async');
-            wp_deregister_script('zxcvbn-async');
-
-            wp_dequeue_script('wc-checkout');
-            wp_deregister_script('wc-checkout');
-
-            wp_dequeue_script('wc-address-i18n');
-            wp_deregister_script('wc-address-i18n');
-
-            wp_dequeue_script('wc-add-to-cart');
-            wp_deregister_script('wc-add-to-cart');
         }
+
+        wp_dequeue_script('wc-order-attribution');
+        wp_deregister_script('wc-order-attribution');
+        wp_dequeue_script('sourcebuster-js');
+        wp_deregister_script('sourcebuster-js');
+
+        wp_dequeue_script('wc-cart-fragments');
+        wp_deregister_script('wc-cart-fragments');
+
+        wp_dequeue_script('selectWoo');
+        wp_dequeue_style('select2');
+
+        wp_dequeue_script('wc-password-strength-meter');
+        wp_deregister_script('wc-password-strength-meter');
+
+        wp_dequeue_script('zxcvbn-async');
+        wp_deregister_script('zxcvbn-async');
+
+        wp_dequeue_script('wc-checkout');
+        wp_deregister_script('wc-checkout');
+
+        wp_dequeue_script('wc-address-i18n');
+        wp_deregister_script('wc-address-i18n');
+
+        wp_dequeue_script('wc-add-to-cart');
+        wp_deregister_script('wc-add-to-cart');
     }, 100);
 }
 
@@ -513,14 +523,14 @@ if (swac_is_lockdown_enabled('session_tuning')) {
     }
 
     add_filter('woocommerce_session_handler', function ($handler_class) {
-        if (!is_admin() && !is_user_logged_in() && class_exists('SWAC_Null_Session_Handler')) {
+        if (!is_admin() && class_exists('SWAC_Null_Session_Handler')) {
             return 'SWAC_Null_Session_Handler';
         }
         return $handler_class;
     });
 
     add_filter('woocommerce_set_cart_cookies', function ($set) {
-        if (!is_user_logged_in() && !is_admin()) {
+        if (!is_admin()) {
             return false;
         }
         return $set;

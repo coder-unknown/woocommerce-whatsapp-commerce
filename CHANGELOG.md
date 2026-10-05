@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2] — 2026-10-05
+
+### Fixed
+- **403 Intercept on `wc-admin` (Menu Capability Check)**: Hooked WooCommerce Admin routes (`page=wc-admin`) to `admin_page_access_denied` in addition to `admin_init`. WordPress core validates menu capabilities inside `wp-admin/includes/menu.php` and executes `wp_die(..., 403)` before `admin_init` is ever called; intercepting `admin_page_access_denied` catches the access denial before headers are closed and seamlessly redirects to the classic product editor (`post-new.php?post_type=product`).
+- **Eliminated Frontend Dual-Cart Split Brain**: Removed `is_user_logged_in()` exemptions from frontend `/cart/`, `/checkout/`, and `/my-account/` redirects (`template_redirect`), `woocommerce_get_cart_url`, native AJAX add-to-cart suppression, `wc-add-to-cart`/`wc-cart-fragments` script dequeues, and `SWAC_Null_Session_Handler`. Prevents administrators from having phantom products accumulating in native WooCommerce PHP sessions while concurrently viewing the client-side WhatsApp `localStorage` drawer.
+- **Visual Builder Preview Safe Guards**: Explicitly exempted visual page builder editors and previews (`?elementor-preview`, `?breakdance`, `is_customize_preview()`, and `is_admin()`) so template editing remains completely unhindered.
+- **Admin Bar Dashicons**: Ensured Dashicons remain enqueued on the frontend for authenticated users so the WordPress admin toolbar icons render crisply.
+
+### Added
+- **Theme & Builder Compatibility Guide** (`README.md`): Added comprehensive documentation on drop-in compatibility with **Breakdance Builder**, **Elementor**, **Bricks**, and **Block Themes**, detailing how native "Add to Cart" forms and loop buttons are intercepted and replaced by the zero-dependency slide-out drawer.
+
+---
+
 ## [1.3.1] — 2026-10-05
 
 ### Fixed
