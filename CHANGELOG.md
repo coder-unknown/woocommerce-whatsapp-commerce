@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Theme & Builder Compatibility Guide** (`README.md`): Added comprehensive documentation on drop-in compatibility with **Breakdance Builder**, **Elementor**, **Bricks**, and **Block Themes**, detailing how native "Add to Cart" forms and loop buttons are intercepted and replaced by the zero-dependency slide-out drawer.
+- **Explore Shortcode Empty State Guidance**: Enhanced fallback notices in `modules/explore/brands.php`, `modules/explore/categories.php`, and `modules/pharmacy/explore-salts.php` to clarify when terms are hidden due to having no associated products (`hide_empty="true"` by default), advising users to assign products or pass `hide_empty="false"`. Also replaced silent blank outputs in `[swac_categories_grid]` with helpful missing/invalid slug messages.
 
 ---
 

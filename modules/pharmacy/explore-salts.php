@@ -55,7 +55,7 @@ function swac_explore_salts_shortcode($atts) {
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No compositions found.', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No compositions found. Please check if compositions have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
     }
 
     $columns = max(1, min(6, intval($atts['columns'])));

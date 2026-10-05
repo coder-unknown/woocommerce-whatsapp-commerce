@@ -56,7 +56,7 @@ function swac_explore_brands_shortcode($atts) {
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No brands found.', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No brands found. Please check if brands have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
     }
 
     ob_start();

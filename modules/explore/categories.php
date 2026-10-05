@@ -31,12 +31,12 @@ function swac_categories_grid_shortcode($atts) {
     ], $atts, 'swac_categories_grid');
 
     if (empty($atts['parent_slug'])) {
-        return '';
+        return '<p class="swac-no-results">' . esc_html__('Please specify a parent_slug attribute (e.g. [swac_categories_grid parent_slug="your-category"]).', 'stateless-wa-commerce') . '</p>';
     }
 
     $parent_term = get_term_by('slug', $atts['parent_slug'], 'product_cat');
     if (!$parent_term || is_wp_error($parent_term)) {
-        return '';
+        return '<p class="swac-no-results">' . sprintf(esc_html__('Category not found for slug "%s".', 'stateless-wa-commerce'), esc_html($atts['parent_slug'])) . '</p>';
     }
 
     $cache_ver = (int)get_option('swac_explore_cache_version', 1);
@@ -58,7 +58,7 @@ function swac_categories_grid_shortcode($atts) {
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '';
+        return '<p class="swac-no-results">' . esc_html__('No subcategories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
     }
 
     // Keep leaf terms
@@ -72,7 +72,7 @@ function swac_categories_grid_shortcode($atts) {
     $terms = $leaf_terms;
 
     if (empty($terms)) {
-        return '';
+        return '<p class="swac-no-results">' . esc_html__('No subcategories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
     }
 
     ob_start();
