@@ -142,6 +142,7 @@ define('SWAC_STORE_NAME',       'My Store');
 define('SWAC_CITY_NAME',        'Mumbai');
 define('SWAC_FREE_SHIPPING_AT', 500.0);  // Free shipping above this value
 define('SWAC_SHIPPING_CHARGE',  49.0);   // Flat charge below threshold
+define('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES', ['781001', '781005']); // Always-free postal codes
 define('SWAC_MAX_CART_ITEMS',   10);     // Protects WhatsApp URL length
 define('SWAC_MAX_QTY_PER_ITEM', 10);     // Per-item quantity ceiling
 define('SWAC_ORDER_DISCLAIMER', '⚡ Final bill & product availability will be confirmed on WhatsApp.');
@@ -246,6 +247,17 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 - **Cart/Checkout Blocks**: Declared compatible
 - **Themes & Page Builders**: 100% theme-agnostic; tested with Breakdance Builder, Elementor, Bricks, and classic/block themes
 - **Web Server / Cache**: LiteSpeed Web Server, Nginx, or any reverse-proxy / full-page caching layer
+
+---
+
+## 🧪 Testing & Verification
+
+The repository includes a 0-dependency automated testing suite powered by Node.js native test runner and static PHP verification:
+
+```bash
+# Run unit tests and PHP invariant/domain verification
+npm test
+```
 
 ---
 

@@ -29,7 +29,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         return sprintf(
             '<a href="%s" class="button swac-out-of-stock-btn">%s</a>',
             esc_url($product->get_permalink()),
-            esc_html__('Out of Stock', 'woocommerce')
+            esc_html__('Out of Stock', 'stateless-wa-commerce')
         );
     }
 

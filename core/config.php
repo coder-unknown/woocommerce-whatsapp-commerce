@@ -70,6 +70,14 @@ define('SWAC_FREE_SHIPPING_AT', 0.0);
  */
 define('SWAC_SHIPPING_CHARGE', 0.0);
 
+/**
+ * Postal codes eligible for always-free shipping regardless of cart total.
+ *
+ * Array of postal code strings. Defaults to empty array [].
+ * Example: ['781001', '781005', '781006']
+ */
+define('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES', []);
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ORDER LIMITS
@@ -150,7 +158,7 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)) . '/');
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.3.2');
+    define('SWAC_VERSION', '1.4.0');
 }
 
 if (!function_exists('swac_get_config')) {
@@ -177,20 +185,21 @@ if (!function_exists('swac_get_config')) {
         $store_name = SWAC_STORE_NAME !== '' ? SWAC_STORE_NAME : (get_bloginfo('name') ?: 'Store');
 
         $defaults = [
-            'phone_number'              => SWAC_PHONE,
-            'store_name'                => $store_name,
-            'base_url'                  => '',
-            'free_shipping_at'          => (float) SWAC_FREE_SHIPPING_AT,
-            'shipping_charge'           => (float) SWAC_SHIPPING_CHARGE,
-            'currency_symbol'           => $currency_symbol,
-            'city_name'                 => SWAC_CITY_NAME,
-            'max_cart_items'            => (int) SWAC_MAX_CART_ITEMS,
-            'max_qty_per_item'          => (int) SWAC_MAX_QTY_PER_ITEM,
-            'order_disclaimer'          => SWAC_ORDER_DISCLAIMER,
+            'phone_number'                      => SWAC_PHONE,
+            'store_name'                        => $store_name,
+            'base_url'                          => '',
+            'free_shipping_at'                  => (float) SWAC_FREE_SHIPPING_AT,
+            'shipping_charge'                   => (float) SWAC_SHIPPING_CHARGE,
+            'always_free_shipping_postal_codes' => (array) (defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []),
+            'currency_symbol'                   => $currency_symbol,
+            'city_name'                         => SWAC_CITY_NAME,
+            'max_cart_items'                    => (int) SWAC_MAX_CART_ITEMS,
+            'max_qty_per_item'                  => (int) SWAC_MAX_QTY_PER_ITEM,
+            'order_disclaimer'                  => SWAC_ORDER_DISCLAIMER,
             // Prescription note: pharmacy module concern — set via swac_commerce_config filter when pharmacy module is active.
-            'prescription_note_enabled' => false,
-            'prescription_note'         => '',
-            'loyalty'                   => [
+            'prescription_note_enabled'         => false,
+            'prescription_note'                 => '',
+            'loyalty'                           => [
                 'enabled'    => (bool) SWAC_LOYALTY_ENABLED,
                 'threshold'  => (int)  SWAC_LOYALTY_THRESHOLD,
                 'item_label' => SWAC_LOYALTY_ITEM_LABEL,

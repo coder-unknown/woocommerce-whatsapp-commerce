@@ -408,6 +408,16 @@
     color: #0c4a6e;
 }
 
+/* Always-Free Postal Code Zone badge */
+.swac-loyalty-card--free-zone {
+    background: #ecfdf5;
+    border-color: #10b981;
+}
+
+.swac-loyalty-card--free-zone .swac-loyalty-body {
+    color: #065f46;
+}
+
 /* STATE 1/4: below threshold — amber nudge */
 .swac-loyalty-card--nudge {
     background: #fff8e1;

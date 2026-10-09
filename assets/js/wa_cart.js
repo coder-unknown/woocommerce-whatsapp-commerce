@@ -20,13 +20,30 @@
      * -------------------------------------------------------------------------
      */
 
+    const safeWindow = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : {});
+    const safeDoc = (typeof document !== 'undefined') ? document : null;
+    const safeStorage = (function () {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                return localStorage;
+            }
+        } catch (e) {}
+        const memoryStore = {};
+        return {
+            getItem: function (k) { return Object.prototype.hasOwnProperty.call(memoryStore, k) ? memoryStore[k] : null; },
+            setItem: function (k, v) { memoryStore[k] = String(v); },
+            removeItem: function (k) { delete memoryStore[k]; },
+            clear: function () { Object.keys(memoryStore).forEach(function (k) { delete memoryStore[k]; }); }
+        };
+    })();
+
     const STORAGE_KEY = 'swac_cart';
     const CUSTOMER_STORAGE_KEY = 'swac_customer_details';
 
     // ── Persistent Customer / Delivery Metadata ──────────────────────────────
     function getCustomerDetails() {
         try {
-            const raw = localStorage.getItem(CUSTOMER_STORAGE_KEY);
+            const raw = safeStorage.getItem(CUSTOMER_STORAGE_KEY);
             if (!raw) return null;
             const data = JSON.parse(raw);
             if (data && typeof data === 'object' && !Array.isArray(data)) {
@@ -53,7 +70,7 @@
                 area: (details.area || '').trim(),
                 pincode: (details.pincode || '').trim()
             };
-            localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(clean));
+            safeStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(clean));
             return clean;
         } catch (e) {
             return details;
@@ -63,16 +80,29 @@
     // ── Delivery Service Zones & Pincode Gate ────────────────────────────────
     let sameDaySet = null;
     let outskirtsSet = null;
+    let alwaysFreeSet = null;
 
     function getZoneSets() {
-        if (!sameDaySet || sameDaySet.size === 0) {
-            const zonesData = window.swacZones || {};
+        if (!sameDaySet || sameDaySet.size === 0 || !alwaysFreeSet) {
+            const zonesData = safeWindow.swacZones || {};
+            const configData = safeWindow.swacCommerce || safeWindow.swacConfig || {};
             const rawSameDay = zonesData.same_day_pins || (zonesData.zones && zonesData.zones.standard && zonesData.zones.standard.pincodes ? Object.keys(zonesData.zones.standard.pincodes) : []) || [];
             const rawOutskirts = zonesData.outskirts_pins || [];
+            const rawAlwaysFree = zonesData.always_free_shipping_codes || configData.always_free_shipping_codes || (typeof CONFIG !== 'undefined' && CONFIG.alwaysFreeShippingCodes) || [];
+
             sameDaySet = new Set(rawSameDay.map(String));
             outskirtsSet = new Set(rawOutskirts.map(String));
+            alwaysFreeSet = new Set((Array.isArray(rawAlwaysFree) ? rawAlwaysFree : []).map(String).map(s => s.replace(/\D/g, '')).filter(Boolean));
         }
-        return { sameDaySet, outskirtsSet };
+        return { sameDaySet, outskirtsSet, alwaysFreeSet };
+    }
+
+    function isAlwaysFreePincode(pincode) {
+        if (!pincode) return false;
+        const clean = String(pincode).replace(/\D/g, '');
+        if (!clean) return false;
+        const { alwaysFreeSet: freeSet } = getZoneSets();
+        return Boolean(freeSet && freeSet.has(clean));
     }
 
     function evaluateDeliveryZone(pincode) {
@@ -80,8 +110,18 @@
         const clean = String(pincode).replace(/\D/g, '');
         if (clean.length < 3) return null;
 
-        const zonesData = window.swacZones || {};
+        const zonesData = safeWindow.swacZones || {};
         const isGated = Boolean(zonesData.gated || (zonesData.same_day_pins && zonesData.same_day_pins.length > 0));
+
+        // Always-free postal codes are always allowed for delivery
+        if (isAlwaysFreePincode(clean)) {
+            const msgs = zonesData.messages || {};
+            return {
+                allowOrder: true,
+                statusClass: 'swac-pin-success',
+                message: msgs.available || msgs.same_day || '✓ Delivery is available to your location'
+            };
+        }
 
         // In Open Mode (default), any valid postal code format is accepted
         if (!isGated) {
@@ -115,6 +155,7 @@
             message: msgs.invalid || msgs.outside || '❌ We do not deliver to this location.'
         };
     }
+
 
     let addressMode = null; // 'preview' or 'edit'
     let addressCollapsed = false;
@@ -159,12 +200,12 @@
     }
 
     // ── Cached DOM references (script is footer-enqueued — DOM already parsed) ─
-    const _bubble = document.getElementById('swac-cart-bubble');
-    const _counter = document.getElementById('swac-cart-count');
+    const _bubble = safeDoc ? safeDoc.getElementById('swac-cart-bubble') : null;
+    const _counter = safeDoc ? safeDoc.getElementById('swac-cart-count') : null;
 
     // ── Configuration ────────────────────────────────────────────────────────
     const CONFIG = (function () {
-        const wa = window.swacCommerce || {};
+        const wa = safeWindow.swacCommerce || safeWindow.swacConfig || {};
         const loy = wa.loyalty || {};
         const isLoyEnabled = (function () {
             if (typeof loy.enabled === 'boolean') return loy.enabled;
@@ -192,6 +233,7 @@
             currencySymbol: wa.currencySymbol || wa.currency_symbol || '',
             freeShippingAt: parseFloat(wa.free_shipping_at) || 0,
             shippingCharge: parseFloat(wa.shipping_charge) || 0,
+            alwaysFreeShippingCodes: (Array.isArray(wa.always_free_shipping_codes) ? wa.always_free_shipping_codes : []).map(String).map(s => s.replace(/\D/g, '')).filter(Boolean),
             isAdmin: Boolean(wa.is_admin),
             maxCartItems: parseInt(wa.max_cart_items, 10) || 10,
             maxQtyPerItem: parseInt(wa.max_qty_per_item, 10) || 10,
@@ -241,7 +283,7 @@
     // ── Storage Helpers ──────────────────────────────────────────────────────
     function getCart() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
+            const raw = safeStorage.getItem(STORAGE_KEY);
             if (!raw) return [];
             const data = JSON.parse(raw);
 
@@ -249,7 +291,7 @@
                 // Expire carts older than 7 days to prevent stale pricing accumulation.
                 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
                 if (data.updatedAt && (Date.now() - data.updatedAt) > SEVEN_DAYS_MS) {
-                    localStorage.removeItem(STORAGE_KEY);
+                    safeStorage.removeItem(STORAGE_KEY);
                     return [];
                 }
                 return data.items;
@@ -266,7 +308,7 @@
                 items: cart,
                 updatedAt: Date.now()
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            safeStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         } catch (e) {
             // QuotaExceededError — storage is full (common in private/incognito browsing).
             // Cart data is not persisted but the in-memory session continues to work.
@@ -320,7 +362,7 @@
     }
 
     function clearCart() {
-        localStorage.removeItem(STORAGE_KEY);
+        safeStorage.removeItem(STORAGE_KEY);
         loyaltyChoice = null;
         hideClearConfirm();
         refreshUI();
@@ -700,11 +742,13 @@
             pincodeInput?.addEventListener('input', function () {
                 syncDraft();
                 applyPincodeGating(this.value, false);
+                refreshLoyaltySection();
             });
 
             pincodeInput?.addEventListener('blur', function () {
                 syncDraft();
                 applyPincodeGating(this.value, true);
+                refreshLoyaltySection();
             });
 
             if (current.pincode) {
@@ -814,15 +858,33 @@
         }
     }
 
+    function getCurrentPincode() {
+        if (addressDraft && addressDraft.pincode) {
+            return String(addressDraft.pincode).trim();
+        }
+        const pinInput = safeDoc ? safeDoc.getElementById('swac-addr-pincode') : null;
+        if (pinInput && pinInput.value) {
+            return String(pinInput.value).trim();
+        }
+        const saved = getCustomerDetails();
+        if (saved && saved.pincode) {
+            return String(saved.pincode).trim();
+        }
+        return '';
+    }
+
     // ── Calculations ─────────────────────────────────────────────────────────
-    function computeCartTotals(cart) {
+    function computeCartTotals(cart, pincode) {
+        const code = pincode !== undefined ? pincode : getCurrentPincode();
+        const isAlwaysFree = isAlwaysFreePincode(code);
+
         const freeAt = CONFIG.freeShippingAt;
         const shipCharge = CONFIG.shippingCharge;
 
         let totalMrp = 0;
         let saleTotal = 0;
 
-        cart.forEach(function (item) {
+        (cart || []).forEach(function (item) {
             const sale = parseFloat(item.salePrice) || 0;
             let mrp = parseFloat(item.mrp) || 0;
 
@@ -833,13 +895,14 @@
                 mrp = sale;
             }
 
-            totalMrp += mrp * item.qty;
-            saleTotal += sale * item.qty;
+            const qty = parseInt(item.qty, 10) || 1;
+            totalMrp += mrp * qty;
+            saleTotal += sale * qty;
         });
 
         let youSave = totalMrp - saleTotal;
         let savePct = totalMrp > 0 ? Math.round(youSave / totalMrp * 100) : 0;
-        const shipping = saleTotal < freeAt ? shipCharge : 0;
+        const shipping = isAlwaysFree ? 0 : (saleTotal < freeAt ? shipCharge : 0);
         let amountPayable = saleTotal + shipping;
 
         if (loyaltyChoice === 'yes' && isLoyaltyActive(saleTotal)) {
@@ -849,16 +912,35 @@
             amountPayable += CONFIG.loyalty.itemPrice;
         }
 
-        return { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable };
+        return { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable, isAlwaysFree };
     }
 
     // ── Loyalty & Delivery Offer State Machine ──────────────────────────────
-    function renderLoyaltyUI(container, cart, totals) {
+    function renderLoyaltyUI(container, cart, totals, pincode) {
+        if (!container) return;
+        const code = pincode !== undefined ? pincode : getCurrentPincode();
+        const isAlwaysFree = Boolean((totals && totals.isAlwaysFree) || isAlwaysFreePincode(code));
+
+        // Always-Free Postal Code Badge
+        if (isAlwaysFree && code) {
+            const freeZoneCard = document.createElement('div');
+            freeZoneCard.className = 'swac-loyalty-card swac-loyalty-card--free-zone';
+            freeZoneCard.innerHTML = `
+                <div class="swac-loyalty-body">
+                    &#127881; <strong>Free Delivery Unlocked!</strong>
+                    <div style="font-size:11px;color:#047857;margin-top:3px;">
+                        Special free delivery zone applied for your postal code (${escHtml(code)}).
+                    </div>
+                </div>
+            `;
+            container.appendChild(freeZoneCard);
+        }
+
         const freeAt = CONFIG.freeShippingAt;
         const shipCharge = CONFIG.shippingCharge;
 
-        // Stage 1: Free Delivery Nudge (orders below free shipping minimum)
-        if (freeAt > 0 && shipCharge > 0 && totals.saleTotal < freeAt) {
+        // Stage 1: Free Delivery Nudge (orders below free shipping minimum, only if NOT already free delivery)
+        if (!isAlwaysFree && freeAt > 0 && shipCharge > 0 && totals.saleTotal < freeAt) {
             loyaltyChoice = null;
             const shipGap = Math.ceil(freeAt - totals.saleTotal);
             const card = document.createElement('div');
@@ -1241,7 +1323,7 @@
             return line;
         });
 
-        const { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable } = computeCartTotals(cart);
+        const { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable } = computeCartTotals(cart, details ? details.pincode : undefined);
         const shipLabel = shipping === 0 ? 'FREE' : fmtInr(shipping);
         const loyaltyActive = isLoyaltyActive(saleTotal);
 
@@ -1578,8 +1660,8 @@
         return `${target.getUTCDate()} ${months[target.getUTCMonth()]}`;
     }
 
-    function getKolkataDeliveryCutoffMessage() {
-        const now = new Date();
+    function getKolkataDeliveryCutoffMessage(customNow) {
+        const now = (customNow instanceof Date) ? customNow : new Date();
         const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
         const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
         const day = istDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
@@ -1600,12 +1682,12 @@
         return `Order now to receive it by tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
     }
 
-    function getDeliveryCutoffMessage() {
-        return getKolkataDeliveryCutoffMessage();
+    function getDeliveryCutoffMessage(customNow) {
+        return getKolkataDeliveryCutoffMessage(customNow);
     }
 
-    function getKolkataDeliveryEstimate() {
-        const now = new Date();
+    function getKolkataDeliveryEstimate(customNow) {
+        const now = (customNow instanceof Date) ? customNow : new Date();
         const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
         const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
         const day = istDate.getUTCDay();
@@ -1620,8 +1702,8 @@
         return `Tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
     }
 
-    function getDeliveryEstimate() {
-        return getKolkataDeliveryEstimate();
+    function getDeliveryEstimate(customNow) {
+        return getKolkataDeliveryEstimate(customNow);
     }
 
     function hydrateDeliveryNotice() {
@@ -1641,16 +1723,45 @@
         }
     }
 
-    // ── Initialization ───────────────────────────────────────────────────────
+    // ── Initialization (Browser only) ──────────────────────────────────────────
     // NOTE: This script is enqueued in the footer (in_footer=true), so the DOM
     // is already parsed when this IIFE runs. Do NOT wrap in DOMContentLoaded —
     // it would never fire because the event has already dispatched.
-    initAddressState();
-    refreshUI();
-    interceptAddToCart();
-    bindDrawerEvents();
-    bindLoopButtons();
-    bindCatalogOrdering();
-    hydrateDeliveryNotice();
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        initAddressState();
+        refreshUI();
+        interceptAddToCart();
+        bindDrawerEvents();
+        bindLoopButtons();
+        bindCatalogOrdering();
+        hydrateDeliveryNotice();
+    }
+
+    // ── CommonJS Export Parity (Automated Testing & Subsystems) ───────────────
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {
+            computeCartTotals,
+            evaluateDeliveryZone,
+            isAlwaysFreePincode,
+            isLoyaltyActive,
+            getKolkataDeliveryCutoffMessage,
+            getDeliveryCutoffMessage,
+            getKolkataDeliveryEstimate,
+            getDeliveryEstimate,
+            getKolkataFormattedDate,
+            buildOrderMessage,
+            getZoneSets,
+            CONFIG,
+            setRuntimeConfig: function (cfg) {
+                Object.assign(CONFIG, cfg);
+            },
+            setZonesData: function (data) {
+                safeWindow.swacZones = data;
+                sameDaySet = null;
+                outskirtsSet = null;
+                alwaysFreeSet = null;
+            }
+        };
+    }
 
 })();

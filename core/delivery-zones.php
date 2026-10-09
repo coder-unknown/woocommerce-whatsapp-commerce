@@ -54,3 +54,41 @@ if (!function_exists('swac_get_delivery_zones')) {
         return (array)apply_filters('swac_delivery_zones', $defaults);
     }
 }
+
+if (!function_exists('swac_is_always_free_shipping_postal_code')) {
+    /**
+     * Check if a given postal code qualifies for always-free shipping.
+     *
+     * @param string|int|null $code Postal code to check.
+     * @return bool
+     */
+    function swac_is_always_free_shipping_postal_code($code): bool
+    {
+        if (empty($code)) {
+            return false;
+        }
+
+        $clean = preg_replace('/\D/', '', (string)$code);
+        if ($clean === '') {
+            return false;
+        }
+
+        $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
+        $always_free = $cfg['always_free_shipping_postal_codes']
+            ?? (defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []);
+
+        /**
+         * Filter postal codes that qualify for always-free shipping.
+         *
+         * @param array $always_free Array of postal code strings.
+         * @param string $code Raw postal code being checked.
+         */
+        $always_free = (array)apply_filters('swac_always_free_shipping_postal_codes', $always_free, $code);
+
+        $clean_list = array_map(function ($c) {
+            return preg_replace('/\D/', '', (string)$c);
+        }, $always_free);
+
+        return in_array($clean, $clean_list, true);
+    }
+}

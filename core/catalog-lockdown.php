@@ -536,3 +536,38 @@ if (swac_is_lockdown_enabled('session_tuning')) {
         return $set;
     }, 999);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 10: BACKGROUND CRON CLEANUP GUARD
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Suppresses unnecessary WooCommerce background cron jobs on init.
+ * Uses a persistent one-time option guard ('swac_cron_cleaned') to unschedule
+ * recurring events from the database, preventing needless PHP wakeups.
+ */
+add_action('init', function () {
+    if (get_option('swac_cron_cleaned')) {
+        return;
+    }
+
+    $unneeded_crons = [
+        'woocommerce_cleanup_sessions',
+        'woocommerce_cleanup_personal_data',
+        'woocommerce_cancel_unpaid_orders',
+        'woocommerce_tracker_send_event',
+    ];
+
+    foreach ($unneeded_crons as $cron_hook) {
+        $timestamp = wp_next_scheduled($cron_hook);
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, $cron_hook);
+        }
+        if (function_exists('wp_clear_scheduled_hook')) {
+            wp_clear_scheduled_hook($cron_hook);
+        }
+    }
+
+    update_option('swac_cron_cleaned', 1);
+}, 20);
+

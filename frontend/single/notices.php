@@ -68,7 +68,7 @@ if (!function_exists('swac_render_single_product_stock_status')) {
 
         return sprintf(
             '<div class="swac-single-stock-notice-wrapper"><div class="swac-sp-notice swac-notice-oos"><div class="swac-notice-content"><strong>%s</strong></div></div></div>',
-            esc_html__('Out of stock', 'woocommerce')
+            esc_html__('Out of stock', 'stateless-wa-commerce')
         );
     }
 }

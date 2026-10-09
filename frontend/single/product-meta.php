@@ -116,7 +116,7 @@ if (!function_exists('swac_action_row_shortcode')) {
         if (!$product->is_in_stock()) {
             return sprintf(
                 '<div class="swac-action-row"><button type="button" class="button swac-out-of-stock-btn" disabled>%s</button></div>',
-                esc_html__('Out of Stock', 'woocommerce')
+                esc_html__('Out of Stock', 'stateless-wa-commerce')
             );
         }
 

@@ -26,3 +26,7 @@ $wpdb->query(
         OR option_name LIKE '_transient_timeout_swac_%'
 ",
 );
+
+// 3. Remove the cron lockdown flag.
+delete_option('swac_cron_cleaned');
+
